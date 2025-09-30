@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.WebUtilities;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.WebUtilities;
 using OpsPortal.Contracts.Responses;
-using System.Text.Json;
 
 namespace OpsPortal.WebApi.Extensions;
 
@@ -11,7 +11,7 @@ public static class HttpResponseExtensions
         PaginatedResponse<T> paginatedResponse,
         HttpRequest request)
     {
-        // Add X-Pagination header with metadata
+        // Add X-Pagination header
         var metadata = new
         {
             paginatedResponse.TotalCount,
@@ -27,41 +27,17 @@ public static class HttpResponseExtensions
         // Build Link header
         var links = new List<string>();
 
-        // First page
-        if (paginatedResponse.PageNumber > 1)
-        {
-            links.Add(CreateLinkHeader(request, 1, paginatedResponse.PageSize, "first"));
-        }
+        if (paginatedResponse.HasPreviousPage) links.Add(CreateLinkHeader(request, paginatedResponse.PageNumber - 1, paginatedResponse.PageSize, "prev"));
 
-        // Previous page
-        if (paginatedResponse.HasPreviousPage)
-        {
-            links.Add(CreateLinkHeader(request, paginatedResponse.PageNumber - 1, paginatedResponse.PageSize, "prev"));
-        }
+        if (paginatedResponse.HasNextPage) links.Add(CreateLinkHeader(request, paginatedResponse.PageNumber + 1, paginatedResponse.PageSize, "next"));
 
-        // Next page
-        if (paginatedResponse.HasNextPage)
-        {
-            links.Add(CreateLinkHeader(request, paginatedResponse.PageNumber + 1, paginatedResponse.PageSize, "next"));
-        }
-
-        // Last page
-        if (paginatedResponse.PageNumber < paginatedResponse.TotalPages)
-        {
-            links.Add(CreateLinkHeader(request, paginatedResponse.TotalPages, paginatedResponse.PageSize, "last"));
-        }
-
-        if (links.Any())
-        {
-            response.Headers.Add("Link", string.Join(", ", links));
-        }
+        if (links.Any()) response.Headers.Add("Link", string.Join(", ", links));
     }
 
     private static string CreateLinkHeader(HttpRequest request, int pageNumber, int pageSize, string rel)
     {
         var baseUrl = $"{request.Scheme}://{request.Host}{request.Path}";
-
-        // Preserve existing query parameters
+        
         var queryParams = QueryHelpers.ParseQuery(request.QueryString.Value);
         queryParams["pageNumber"] = pageNumber.ToString();
         queryParams["pageSize"] = pageSize.ToString();

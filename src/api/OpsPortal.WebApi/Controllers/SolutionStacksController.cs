@@ -18,30 +18,27 @@ public class SolutionStacksController : ControllerBase
     }
 
     /// <summary>
-    /// Retrieves a paginated list of solution stacks with optional filtering and sorting
+    ///     Retrieves a paginated list of solution stacks with optional filtering and sorting
     /// </summary>
     /// <param name="query">Query parameters for pagination, filtering, and sorting</param>
     /// <returns>A paginated response containing solution stack data</returns>
     /// <response code="200">Returns the paginated list of solution stacks</response>
     /// <response code="400">If the query parameters are invalid</response>
     /// <remarks>
-    /// Sample request:
-    /// 
+    ///     Sample request:
     ///     GET /api/solution-stacks?pageNumber=1&amp;pageSize=20&amp;searchTerm=web&amp;sortBy=name&amp;sortDescending=false
-    /// 
-    /// Query Parameters:
-    /// - **PageNumber**: Page number (default: 1, minimum: 1)
-    /// - **PageSize**: Items per page (default: 20, maximum: 100)
-    /// - **SearchTerm**: Optional search term to filter solution stacks by name or description
-    /// - **SortBy**: Field name to sort by (e.g., "name", "category", "updatedAt")
-    /// - **SortDescending**: Sort direction (default: false for ascending)
-    /// 
-    /// The response includes pagination metadata in both the response body and HTTP headers.
+    ///     Query Parameters:
+    ///     - **PageNumber**: Page number (default: 1, minimum: 1)
+    ///     - **PageSize**: Items per page (default: 20, maximum: 100)
+    ///     - **SearchTerm**: Optional search term to filter solution stacks by name or description
+    ///     - **SortBy**: Field name to sort by (e.g., "name", "category", "updatedAt")
+    ///     - **SortDescending**: Sort direction (default: false for ascending)
+    ///     The response includes pagination metadata in both the response body and HTTP headers.
     /// </remarks>
     [HttpGet]
     [ProducesResponseType(typeof(PaginatedResponse<SolutionStackResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PaginatedResponse<SolutionStackResponse>>> GetAll(
-        [FromQuery] GetAllSolutionStacks query)
+        [FromQuery]GetAllSolutionStacks query)
     {
         var result = await _mediator.Send(query);
 
