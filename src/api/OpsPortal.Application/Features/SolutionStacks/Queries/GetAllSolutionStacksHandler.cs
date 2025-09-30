@@ -53,6 +53,7 @@ public class GetAllSolutionStacksHandler : IRequestHandler<GetAllSolutionStacks,
                 s.Category,
                 s.Status,
                 s.Owner,
+                s.CreatedAt,
                 s.UpdatedAt))
             .ToListAsync(cancellationToken);
 

@@ -8,4 +8,5 @@ public record SolutionStackResponse(
     string Category,
     string Status,
     string Owner,
+    DateTime CreatedAt,
     DateTime UpdatedAt);
