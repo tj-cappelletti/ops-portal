@@ -9,18 +9,19 @@ public abstract record PaginatedRequest
 
     public int PageSize { get; init; } = DefaultPageSize;
 
-    public int Skip => (ValidPageNumber - 1) * ValidPageSize;
+    internal int Skip => (GetValidPageNumber() - 1) * GetValidPageSize();
 
     public string? SortBy { get; init; }
 
     public bool SortDescending { get; init; } = false;
 
-    public int ValidPageNumber => PageNumber < 1 ? 1 : PageNumber;
-
-    public int ValidPageSize => PageSize switch
+    public int GetValidPageNumber()
     {
-        <= 0 => DefaultPageSize,
-        > MaxPageSize => MaxPageSize,
-        _ => PageSize
-    };
+        return Math.Max(1, PageNumber);
+    }
+
+    public int GetValidPageSize()
+    {
+        return Math.Min(Math.Max(1, PageSize), MaxPageSize);
+    }
 }

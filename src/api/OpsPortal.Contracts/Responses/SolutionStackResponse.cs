@@ -9,7 +9,3 @@ public record SolutionStackResponse(
     string Status,
     string Owner,
     DateTime UpdatedAt);
-
-public record SolutionStackListResponse(
-    List<SolutionStackResponse> Items,
-    int TotalCount);
