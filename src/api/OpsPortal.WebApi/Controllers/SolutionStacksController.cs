@@ -46,4 +46,28 @@ public class SolutionStacksController : ControllerBase
 
         return Ok(result);
     }
+
+    /// <summary>
+    ///     Retrieves a solution stack by its unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the solution stack.</param>
+    /// <returns>The solution stack with the specified ID, if found.</returns>
+    /// <response code="200">Returns the solution stack with the specified ID.</response>
+    /// <response code="404">If a solution stack with the specified ID is not found.</response>
+    /// <remarks>
+    ///     Sample request:
+    ///     GET /api/solution-stacks/{id}
+    ///     Replace <c>{id}</c> with the GUID of the solution stack to retrieve.
+    /// </remarks>
+    [HttpGet]
+    [ProducesResponseType(typeof(SolutionStackResponse), StatusCodes.Status200OK)]
+    [Route("{id:guid}")]
+    public async Task<ActionResult<SolutionStackResponse>> GetById([FromRoute]Guid id)
+    {
+        var result = await _mediator.Send(new GetSolutionStack(id));
+
+        if (result == null) return NotFound();
+
+        return Ok(result);
+    }
 }
