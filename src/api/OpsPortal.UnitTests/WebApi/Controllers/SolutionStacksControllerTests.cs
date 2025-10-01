@@ -106,7 +106,7 @@ public class SolutionStacksControllerTests
 
     [Fact]
     [Trait(TestAnnotations.TraitNames.Category, TestAnnotations.Categories.Unit)]
-    public async void GetAll_Should_Return_Ok_When_Empty()
+    public async Task GetAll_Should_Return_Ok_When_Empty()
     {
         // Arrange
         var query = new GetAllSolutionStacks
@@ -152,7 +152,7 @@ public class SolutionStacksControllerTests
 
     [Fact]
     [Trait(TestAnnotations.TraitNames.Category, TestAnnotations.Categories.Unit)]
-    public async void GetAll_Should_Return_Ok_When_NonEmpty()
+    public async Task GetAll_Should_Return_Ok_When_NonEmpty()
     {
         // Arrange
         var items = new List<GetSolutionStackResponse>
@@ -231,7 +231,7 @@ public class SolutionStacksControllerTests
 
     [Fact]
     [Trait(TestAnnotations.TraitNames.Category, TestAnnotations.Categories.Unit)]
-    public async void GetById_Should_Return_NotFound_When_Not_Found()
+    public async Task GetById_Should_Return_NotFound_When_Not_Found()
     {
         // Arrange
         var id = Guid.NewGuid();
@@ -265,7 +265,7 @@ public class SolutionStacksControllerTests
 
     [Fact]
     [Trait(TestAnnotations.TraitNames.Category, TestAnnotations.Categories.Unit)]
-    public async void GetById_Should_Return_Ok_When_Found()
+    public async Task GetById_Should_Return_Ok_When_Found()
     {
         // Arrange
         var id = Guid.NewGuid();
