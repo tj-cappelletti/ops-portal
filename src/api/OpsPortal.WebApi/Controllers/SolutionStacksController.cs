@@ -61,10 +61,11 @@ public class SolutionStacksController : ControllerBase
     /// </remarks>
     [HttpGet]
     [ProducesResponseType(typeof(SolutionStackResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Route("{id:guid}")]
     public async Task<ActionResult<SolutionStackResponse>> GetById([FromRoute]Guid id)
     {
-        var result = await _mediator.Send(new GetSolutionStack(id));
+        var result = await _mediator.Send(new GetSolutionStackById(id));
 
         if (result == null) return NotFound();
 

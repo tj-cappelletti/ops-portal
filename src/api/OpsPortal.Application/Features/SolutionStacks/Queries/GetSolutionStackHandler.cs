@@ -5,14 +5,16 @@ using OpsPortal.Contracts.Responses;
 
 namespace OpsPortal.Application.Features.SolutionStacks.Queries;
 
-public class GetSolutionStackHandler : IRequestHandler<GetSolutionStack, SolutionStackResponse?>
+public class GetSolutionStackHandler : IRequestHandler<GetSolutionStackById, SolutionStackResponse?>
 {
     private readonly IApplicationDbContext _context;
+
     public GetSolutionStackHandler(IApplicationDbContext context)
     {
         _context = context;
     }
-    public async Task<SolutionStackResponse?> Handle(GetSolutionStack request, CancellationToken cancellationToken)
+
+    public async Task<SolutionStackResponse?> Handle(GetSolutionStackById request, CancellationToken cancellationToken)
     {
         var solutionStack = await _context.SolutionStacks
             .Where(s => s.Id == request.Id)
