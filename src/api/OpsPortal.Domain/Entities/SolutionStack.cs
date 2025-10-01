@@ -21,7 +21,10 @@ public class SolutionStack
     public DateTime UpdatedAt { get; private set; }
 
     // Constructor for EF Core
+    // Disable nullable warning for this constructor
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     private SolutionStack() { }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
     public SolutionStack(string name, string description, string category, string owner)
     {
