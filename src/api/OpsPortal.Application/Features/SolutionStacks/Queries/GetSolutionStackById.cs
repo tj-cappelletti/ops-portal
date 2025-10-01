@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using OpsPortal.Contracts.Responses;
+using OpsPortal.Contracts.SolutionStacks;
 
 namespace OpsPortal.Application.Features.SolutionStacks.Queries;
 

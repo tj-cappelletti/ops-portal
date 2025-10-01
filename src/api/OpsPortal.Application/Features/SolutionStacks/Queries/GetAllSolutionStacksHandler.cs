@@ -1,7 +1,8 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using OpsPortal.Application.Common.Interfaces;
-using OpsPortal.Contracts.Responses;
+using OpsPortal.Contracts.Common;
+using OpsPortal.Contracts.SolutionStacks;
 
 namespace OpsPortal.Application.Features.SolutionStacks.Queries;
 

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpsPortal.Contracts.Responses;
+using OpsPortal.Contracts.Common;
 
 namespace OpsPortal.Application.Common.Extensions;
 

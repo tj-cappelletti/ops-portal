@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using OpsPortal.Application.Common.Models;
-using OpsPortal.Contracts.Responses;
+using OpsPortal.Contracts.Common;
+using OpsPortal.Contracts.SolutionStacks;
 
 namespace OpsPortal.Application.Features.SolutionStacks.Queries;
 

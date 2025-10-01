@@ -1,4 +1,4 @@
-﻿namespace OpsPortal.Contracts.Responses;
+﻿namespace OpsPortal.Contracts.SolutionStacks;
 
 public record SolutionStackResponse(
     Guid Id,

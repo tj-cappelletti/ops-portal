@@ -1,4 +1,4 @@
-﻿namespace OpsPortal.Contracts.Responses;
+﻿namespace OpsPortal.Contracts.Common;
 
 public record PaginatedResponse<T>(
     List<T> Items,

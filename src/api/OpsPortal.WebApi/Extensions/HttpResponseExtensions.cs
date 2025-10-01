@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.WebUtilities;
-using OpsPortal.Contracts.Responses;
+using OpsPortal.Contracts.Common;
 
 namespace OpsPortal.WebApi.Extensions;
 

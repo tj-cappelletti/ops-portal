@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using OpsPortal.Application.Features.SolutionStacks.Queries;
-using OpsPortal.Contracts.Responses;
+using OpsPortal.Contracts.Common;
+using OpsPortal.Contracts.SolutionStacks;
 using OpsPortal.UnitTests.Helpers;
 using OpsPortal.WebApi.Controllers;
 
