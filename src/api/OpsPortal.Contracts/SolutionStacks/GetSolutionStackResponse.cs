@@ -1,6 +1,6 @@
 ﻿namespace OpsPortal.Contracts.SolutionStacks;
 
-public record SolutionStackResponse(
+public record GetSolutionStackResponse(
     Guid Id,
     string Name,
     string Slug,

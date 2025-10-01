@@ -44,8 +44,8 @@ public class SolutionStacksController : ControllerBase
     ///     - <c>Link</c>: RFC5988-compliant navigation links for <c>next</c> and <c>prev</c> pages
     /// </remarks>
     [HttpGet]
-    [ProducesResponseType(typeof(PaginatedResponse<SolutionStackResponse>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PaginatedResponse<SolutionStackResponse>>> GetAll(
+    [ProducesResponseType(typeof(PaginatedResponse<GetSolutionStackResponse>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PaginatedResponse<GetSolutionStackResponse>>> GetAll(
         [FromQuery]GetAllSolutionStacks query)
     {
         var result = await _mediator.Send(query);
@@ -74,10 +74,10 @@ public class SolutionStacksController : ControllerBase
     ///     None
     /// </remarks>
     [HttpGet]
-    [ProducesResponseType(typeof(SolutionStackResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(GetSolutionStackResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Route("{id:guid}")]
-    public async Task<ActionResult<SolutionStackResponse>> GetById([FromRoute]Guid id)
+    public async Task<ActionResult<GetSolutionStackResponse>> GetById([FromRoute]Guid id)
     {
         var result = await _mediator.Send(new GetSolutionStackById(id));
 

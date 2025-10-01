@@ -5,7 +5,7 @@ using OpsPortal.Contracts.SolutionStacks;
 
 namespace OpsPortal.Application.Features.SolutionStacks.Queries;
 
-public record GetAllSolutionStacks : PaginatedRequest, IRequest<PaginatedResponse<SolutionStackResponse>>
+public record GetAllSolutionStacks : PaginatedRequest, IRequest<PaginatedResponse<GetSolutionStackResponse>>
 {
     public string? SearchTerm { get; init; }
 }

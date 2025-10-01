@@ -6,7 +6,7 @@ using OpsPortal.Contracts.SolutionStacks;
 
 namespace OpsPortal.Application.Features.SolutionStacks.Queries;
 
-public class GetAllSolutionStacksHandler : IRequestHandler<GetAllSolutionStacks, PaginatedResponse<SolutionStackResponse>>
+public class GetAllSolutionStacksHandler : IRequestHandler<GetAllSolutionStacks, PaginatedResponse<GetSolutionStackResponse>>
 {
     private readonly IApplicationDbContext _context;
 
@@ -15,7 +15,7 @@ public class GetAllSolutionStacksHandler : IRequestHandler<GetAllSolutionStacks,
         _context = context;
     }
 
-    public async Task<PaginatedResponse<SolutionStackResponse>> Handle(
+    public async Task<PaginatedResponse<GetSolutionStackResponse>> Handle(
         GetAllSolutionStacks request,
         CancellationToken cancellationToken)
     {
@@ -47,7 +47,7 @@ public class GetAllSolutionStacksHandler : IRequestHandler<GetAllSolutionStacks,
         var solutionStacks = await query
             .Skip(request.Skip)
             .Take(request.GetValidPageSize())
-            .Select(s => new SolutionStackResponse(
+            .Select(s => new GetSolutionStackResponse(
                 s.Id,
                 s.Name,
                 s.Slug,
@@ -59,7 +59,7 @@ public class GetAllSolutionStacksHandler : IRequestHandler<GetAllSolutionStacks,
                 s.UpdatedAt))
             .ToListAsync(cancellationToken);
 
-        return PaginatedResponse<SolutionStackResponse>.Create(
+        return PaginatedResponse<GetSolutionStackResponse>.Create(
             solutionStacks,
             request.GetValidPageNumber(),
             request.GetValidPageSize(),

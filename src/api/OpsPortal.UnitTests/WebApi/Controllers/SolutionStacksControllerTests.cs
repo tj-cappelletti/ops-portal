@@ -115,9 +115,9 @@ public class SolutionStacksControllerTests
             PageSize = 10
         };
 
-        var items = new List<SolutionStackResponse>();
+        var items = new List<GetSolutionStackResponse>();
 
-        var paginatedResponse = new PaginatedResponse<SolutionStackResponse>(items, 1, 10, 0, 0, false, false);
+        var paginatedResponse = new PaginatedResponse<GetSolutionStackResponse>(items, 1, 10, 0, 0, false, false);
 
         var mediatorMock = new Mock<IMediator>();
         mediatorMock
@@ -137,7 +137,7 @@ public class SolutionStacksControllerTests
         Assert.NotNull(okResult);
         Assert.Equal(200, okResult.StatusCode);
 
-        var returnedResponse = okResult.Value as PaginatedResponse<SolutionStackResponse>;
+        var returnedResponse = okResult.Value as PaginatedResponse<GetSolutionStackResponse>;
         Assert.NotNull(returnedResponse);
         Assert.Same(paginatedResponse, returnedResponse);
 
@@ -155,7 +155,7 @@ public class SolutionStacksControllerTests
     public async void GetAll_Should_Return_Ok_When_NonEmpty()
     {
         // Arrange
-        var items = new List<SolutionStackResponse>
+        var items = new List<GetSolutionStackResponse>
         {
             new(
                 Guid.NewGuid(),
@@ -189,7 +189,7 @@ public class SolutionStacksControllerTests
             PageSize = pageSize
         };
 
-        var paginatedResponse = new PaginatedResponse<SolutionStackResponse>(
+        var paginatedResponse = new PaginatedResponse<GetSolutionStackResponse>(
             items,
             pageNumber,
             pageSize,
@@ -216,7 +216,7 @@ public class SolutionStacksControllerTests
         Assert.NotNull(okResult);
         Assert.Equal(200, okResult.StatusCode);
 
-        var returnedResponse = okResult.Value as PaginatedResponse<SolutionStackResponse>;
+        var returnedResponse = okResult.Value as PaginatedResponse<GetSolutionStackResponse>;
         Assert.NotNull(returnedResponse);
         Assert.Same(paginatedResponse, returnedResponse);
 
@@ -239,7 +239,7 @@ public class SolutionStacksControllerTests
         var mediatorMock = new Mock<IMediator>();
         mediatorMock
             .Setup(m => m.Send(It.Is<GetSolutionStackById>(q => q.Id == id), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((SolutionStackResponse?)null)
+            .ReturnsAsync((GetSolutionStackResponse?)null)
             .Verifiable(Times.Once);
 
         var responseHeaders = new HeaderDictionary();
@@ -270,7 +270,7 @@ public class SolutionStacksControllerTests
         // Arrange
         var id = Guid.NewGuid();
 
-        var solutionStack = new SolutionStackResponse(
+        var solutionStack = new GetSolutionStackResponse(
             id,
             "Stack 1",
             "stack-1",
@@ -299,7 +299,7 @@ public class SolutionStacksControllerTests
         Assert.NotNull(okResult);
         Assert.Equal(200, okResult.StatusCode);
 
-        var returnedResponse = okResult.Value as SolutionStackResponse;
+        var returnedResponse = okResult.Value as GetSolutionStackResponse;
         Assert.NotNull(returnedResponse);
         Assert.Same(solutionStack, returnedResponse);
 
