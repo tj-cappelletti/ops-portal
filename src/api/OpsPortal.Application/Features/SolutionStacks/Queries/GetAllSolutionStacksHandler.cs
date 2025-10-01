@@ -24,6 +24,7 @@ public class GetAllSolutionStacksHandler : IRequestHandler<GetAllSolutionStacks,
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
         {
             var searchTerm = request.SearchTerm.ToLower();
+            // TODO: Consider using full-text search for better performance on large datasets
             query = query.Where(s =>
                 s.Name.ToLower().Contains(searchTerm) ||
                 s.Description.ToLower().Contains(searchTerm));
