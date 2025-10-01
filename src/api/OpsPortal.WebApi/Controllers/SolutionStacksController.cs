@@ -21,33 +21,40 @@ public class SolutionStacksController : ControllerBase
     /// <summary>
     ///     Retrieves a paginated list of solution stacks with optional filtering and sorting
     /// </summary>
-    /// <param name="query">Query parameters for pagination, filtering, and sorting</param>
+    /// <param name="request">Query parameters for pagination, filtering, and sorting</param>
     /// <returns>A paginated response containing solution stack data</returns>
     /// <response code="200">Returns the paginated list of solution stacks</response>
     /// <response code="400">If the query parameters are invalid</response>
     /// <remarks>
     ///     <b>Sample request:</b>
     ///     GET /api/solution-stacks?pageNumber=1&amp;pageSize=20&amp;searchTerm=web&amp;sortBy=name&amp;sortDescending=false
-    /// 
     ///     <b>Query Parameters:</b>
     ///     - **PageNumber**: Page number (default: 1, minimum: 1)
     ///     - **PageSize**: Items per page (default: 20, maximum: 100)
     ///     - **SearchTerm**: Optional search term to filter solution stacks by name or description
     ///     - **SortBy**: Field name to sort by (e.g., "name", "category", "updatedAt")
     ///     - **SortDescending**: Sort direction (default: false for ascending)
-    ///
     ///     <b>Response:</b>
     ///     The response includes pagination metadata in both the response body and HTTP headers.
-    /// 
     ///     <b>Response Headers:</b>
-    ///     - <c>X-Pagination</c>: JSON object with <c>TotalCount</c>, <c>PageSize</c>, <c>PageNumber</c>, <c>TotalPages</c>, <c>HasNextPage</c>, <c>HasPreviousPage</c>
+    ///     - <c>X-Pagination</c>: JSON object with <c>TotalCount</c>, <c>PageSize</c>, <c>PageNumber</c>, <c>TotalPages</c>,
+    ///     <c>HasNextPage</c>, <c>HasPreviousPage</c>
     ///     - <c>Link</c>: RFC5988-compliant navigation links for <c>next</c> and <c>prev</c> pages
     /// </remarks>
     [HttpGet]
     [ProducesResponseType(typeof(PaginatedResponse<GetSolutionStackResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PaginatedResponse<GetSolutionStackResponse>>> GetAll(
-        [FromQuery]GetAllSolutionStacks query)
+        [FromQuery]GetAllSolutionStacksRequest request)
     {
+        var query = new GetAllSolutionStacks
+        {
+            PageNumber = request.PageNumber,
+            PageSize = request.PageSize,
+            SearchTerm = request.SearchTerm,
+            SortBy = request.SortBy,
+            SortDescending = request.SortDescending
+        };
+
         var result = await _mediator.Send(query);
 
         Response.AddPaginationHeaders(result, Request);
@@ -66,10 +73,8 @@ public class SolutionStacksController : ControllerBase
     ///     <b>Sample request:</b>
     ///     GET /api/solution-stacks/{id}
     ///     Replace <c>{id}</c> with the GUID of the solution stack to retrieve.
-    ///
     ///     <b>Response:</b>
     ///     The solution stack details will be returned in the response body if found.
-    ///
     ///     <b>Response Headers:</b>
     ///     None
     /// </remarks>
