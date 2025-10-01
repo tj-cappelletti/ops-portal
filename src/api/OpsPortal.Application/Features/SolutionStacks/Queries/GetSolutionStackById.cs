@@ -3,4 +3,4 @@ using OpsPortal.Contracts.Responses;
 
 namespace OpsPortal.Application.Features.SolutionStacks.Queries;
 
-public record GetSolutionStack(Guid Id) : IRequest<SolutionStackResponse?>;
+public record GetSolutionStackById(Guid Id) : IRequest<SolutionStackResponse?>;
