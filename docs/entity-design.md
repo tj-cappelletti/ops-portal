@@ -11,27 +11,24 @@ The decision impacts performance, scalability, and system design, but modern har
 flowchart TD
     Start[Designing New Entity]
     
-    Q1{Will it have<br/>external references?}
-    Q2{Expected write<br/>volume?}
-    Q3{Time-series or<br/>sequential queries?}
-    Q4{Part of reporting<br/>aggregations?}
+    Q1{Expected write<br/>volume?}
+    Q2{Time-series or<br/>sequential queries?}
+    Q3{Part of reporting<br/>aggregations?}
     
-    GUID[Use GUID PK]
-    HYBRID[Use Integer PK<br/>+ Public GUID]
+    GUID[Use GUID PK<br/>✓ External refs safe<br/>✓ Portable]
+    HYBRID[Use Integer PK<br/>+ Public GUID<br/>✓ Performance<br/>✓ External refs safe]
     
     Start --> Q1
-    Q1 -->|No| Q2
-    Q1 -->|Yes| Q2
     
-    Q2 -->|Low < 100/min| GUID
-    Q2 -->|Medium 100-1000/min| Q3
-    Q2 -->|High > 1000/min| HYBRID
+    Q1 -->|Low < 100/min| GUID
+    Q1 -->|Medium 100-1000/min| Q2
+    Q1 -->|High > 1000/min| HYBRID
+    
+    Q2 -->|No| GUID
+    Q2 -->|Yes| Q3
     
     Q3 -->|No| GUID
-    Q3 -->|Yes| Q4
-    
-    Q4 -->|No| GUID
-    Q4 -->|Yes| HYBRID
+    Q3 -->|Yes| HYBRID
     
     style GUID fill:#90EE90
     style HYBRID fill:#FFE4B5
