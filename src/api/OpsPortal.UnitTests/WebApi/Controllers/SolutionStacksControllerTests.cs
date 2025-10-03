@@ -15,6 +15,38 @@ namespace OpsPortal.UnitTests.WebApi.Controllers;
 [ExcludeFromCodeCoverage]
 public class SolutionStacksControllerTests
 {
+    private static void AssertNotFoundResult<T>(ActionResult<T> result)
+    {
+        var notFoundResult = result.Result as NotFoundResult;
+        Assert.NotNull(notFoundResult);
+        Assert.Equal(404, notFoundResult.StatusCode);
+    }
+
+    private static void AssertOkResult<TActionResult, TObjectResult>(ActionResult<TActionResult> result, TObjectResult expectedResult)
+        where TObjectResult : class
+    {
+        var okResult = result.Result as OkObjectResult;
+        Assert.NotNull(okResult);
+        Assert.Equal(200, okResult.StatusCode);
+
+        var returnedResponse = okResult.Value as TObjectResult;
+        Assert.NotNull(returnedResponse);
+        Assert.Same(expectedResult, returnedResponse);
+    }
+
+    private static void AssertPaginationHeaders(HeaderDictionary headers, bool expectPagination, bool expectLinks)
+    {
+        if (expectPagination)
+            Assert.True(headers.ContainsKey("X-Pagination"));
+        else
+            Assert.False(headers.ContainsKey("X-Pagination"));
+
+        if (expectLinks)
+            Assert.True(headers.ContainsKey("Link"));
+        else
+            Assert.False(headers.ContainsKey("Link"));
+    }
+
     private static SolutionStacksController CreateControllerWithMediatorMock(IMediator mediator, HeaderDictionary responseHeaders)
     {
         var httpRequestMock = new Mock<HttpRequest>();
@@ -109,10 +141,16 @@ public class SolutionStacksControllerTests
     public async Task GetAll_Should_Return_Ok_When_Empty()
     {
         // Arrange
-        var query = new GetAllSolutionStacks
+        var request = new GetAllSolutionStacksRequest
         {
             PageNumber = 1,
             PageSize = 10
+        };
+
+        var query = new GetAllSolutionStacks
+        {
+            PageNumber = request.PageNumber,
+            PageSize = request.PageSize
         };
 
         var items = new List<GetSolutionStackResponse>();
@@ -130,20 +168,11 @@ public class SolutionStacksControllerTests
         var controller = CreateControllerWithMediatorMock(mediatorMock.Object, responseHeaders);
 
         // Act
-        var result = await controller.GetAll(query);
+        var result = await controller.GetAll(request);
 
         // Assert
-        var okResult = result.Result as OkObjectResult;
-        Assert.NotNull(okResult);
-        Assert.Equal(200, okResult.StatusCode);
-
-        var returnedResponse = okResult.Value as PaginatedResponse<GetSolutionStackResponse>;
-        Assert.NotNull(returnedResponse);
-        Assert.Same(paginatedResponse, returnedResponse);
-
-        // Verify pagination headers
-        Assert.True(responseHeaders.ContainsKey("X-Pagination"));
-        Assert.False(responseHeaders.ContainsKey("Link")); // No next/prev links for empty result
+        AssertOkResult(result, paginatedResponse);
+        AssertPaginationHeaders(responseHeaders, true, false);
 
         // Verify mediator interactions
         mediatorMock.VerifyAll();
@@ -183,10 +212,19 @@ public class SolutionStacksControllerTests
         var pageSize = items.Count;
         var totalPages = 5;
 
-        var query = new GetAllSolutionStacks
+        var request = new GetAllSolutionStacksRequest
         {
             PageNumber = pageNumber,
             PageSize = pageSize
+        };
+
+        var query = new GetAllSolutionStacks
+        {
+            PageNumber = request.PageNumber,
+            PageSize = request.PageSize,
+            SearchTerm = request.SearchTerm,
+            SortBy = request.SortBy,
+            SortDescending = request.SortDescending
         };
 
         var paginatedResponse = new PaginatedResponse<GetSolutionStackResponse>(
@@ -209,20 +247,11 @@ public class SolutionStacksControllerTests
         var controller = CreateControllerWithMediatorMock(mediatorMock.Object, responseHeaders);
 
         // Act
-        var result = await controller.GetAll(query);
+        var result = await controller.GetAll(request);
 
         // Assert
-        var okResult = result.Result as OkObjectResult;
-        Assert.NotNull(okResult);
-        Assert.Equal(200, okResult.StatusCode);
-
-        var returnedResponse = okResult.Value as PaginatedResponse<GetSolutionStackResponse>;
-        Assert.NotNull(returnedResponse);
-        Assert.Same(paginatedResponse, returnedResponse);
-
-        // Verify pagination headers
-        Assert.True(responseHeaders.ContainsKey("X-Pagination"));
-        Assert.True(responseHeaders.ContainsKey("Link")); // Next/prev links should be present
+        AssertOkResult(result, paginatedResponse);
+        AssertPaginationHeaders(responseHeaders, true, true);
 
         // Verify mediator interactions
         mediatorMock.VerifyAll();
@@ -235,10 +264,11 @@ public class SolutionStacksControllerTests
     {
         // Arrange
         var id = Guid.NewGuid();
+        var query = new GetSolutionStackById(id);
 
         var mediatorMock = new Mock<IMediator>();
         mediatorMock
-            .Setup(m => m.Send(It.Is<GetSolutionStackById>(q => q.Id == id), It.IsAny<CancellationToken>()))
+            .Setup(m => m.Send(It.Is(query, new GetSolutionStackByIdEqualityComparer()), It.IsAny<CancellationToken>()))
             .ReturnsAsync((GetSolutionStackResponse?)null)
             .Verifiable(Times.Once);
 
@@ -250,13 +280,8 @@ public class SolutionStacksControllerTests
         var result = await controller.GetById(id);
 
         // Assert
-        var notFoundResult = result.Result as NotFoundResult;
-        Assert.NotNull(notFoundResult);
-        Assert.Equal(404, notFoundResult.StatusCode);
-
-        // Verify no pagination headers added
-        Assert.False(responseHeaders.ContainsKey("X-Pagination"));
-        Assert.False(responseHeaders.ContainsKey("Link"));
+        AssertNotFoundResult(result);
+        AssertPaginationHeaders(responseHeaders, false, false);
 
         // Verify mediator interactions
         mediatorMock.VerifyAll();
@@ -269,6 +294,7 @@ public class SolutionStacksControllerTests
     {
         // Arrange
         var id = Guid.NewGuid();
+        var query = new GetSolutionStackById(id);
 
         var solutionStack = new GetSolutionStackResponse(
             id,
@@ -281,9 +307,10 @@ public class SolutionStacksControllerTests
             DateTime.UtcNow.AddDays(-10),
             DateTime.UtcNow.AddDays(-5));
 
+
         var mediatorMock = new Mock<IMediator>();
         mediatorMock
-            .Setup(m => m.Send(It.Is<GetSolutionStackById>(q => q.Id == id), It.IsAny<CancellationToken>()))
+            .Setup(m => m.Send(It.Is(query, new GetSolutionStackByIdEqualityComparer()), It.IsAny<CancellationToken>()))
             .ReturnsAsync(solutionStack)
             .Verifiable(Times.Once);
 
@@ -295,17 +322,8 @@ public class SolutionStacksControllerTests
         var result = await controller.GetById(id);
 
         // Assert
-        var okResult = result.Result as OkObjectResult;
-        Assert.NotNull(okResult);
-        Assert.Equal(200, okResult.StatusCode);
-
-        var returnedResponse = okResult.Value as GetSolutionStackResponse;
-        Assert.NotNull(returnedResponse);
-        Assert.Same(solutionStack, returnedResponse);
-
-        // Verify no pagination headers added
-        Assert.False(responseHeaders.ContainsKey("X-Pagination"));
-        Assert.False(responseHeaders.ContainsKey("Link"));
+        AssertOkResult(result, solutionStack);
+        AssertPaginationHeaders(responseHeaders, false, false);
 
         // Verify mediator interactions
         mediatorMock.VerifyAll();
