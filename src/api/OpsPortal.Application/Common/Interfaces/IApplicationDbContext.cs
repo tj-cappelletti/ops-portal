@@ -7,7 +7,9 @@ public interface IApplicationDbContext
 {
     DbSet<SolutionStack> SolutionStacks { get; }
 
-    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+    DbSet<SolutionStackStatus> SolutionStackStatuses { get; }
 
     int SaveChanges();
+
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
