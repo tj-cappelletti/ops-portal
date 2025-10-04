@@ -53,7 +53,7 @@ public class GetAllSolutionStacksHandler : IRequestHandler<GetAllSolutionStacks,
                 s.Slug,
                 s.Description,
                 s.Category,
-                s.Status,
+                s.Status.Name,
                 s.Owner,
                 s.CreatedAt,
                 s.UpdatedAt))
