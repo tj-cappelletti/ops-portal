@@ -1,14 +1,5 @@
-﻿namespace OpsPortal.Contracts.SolutionStacks;
+﻿using OpsPortal.Contracts.Common;
 
-public class GetAllSolutionStacksRequest
-{
-    public int PageNumber { get; set; } = 1;
+namespace OpsPortal.Contracts.SolutionStacks;
 
-    public int PageSize { get; set; } = 20;
-
-    public string? SearchTerm { get; set; }
-
-    public string? SortBy { get; set; }
-
-    public bool SortDescending { get; set; } = false;
-}
+public class GetAllSolutionStacksRequest : SearchPaginatedRequest;

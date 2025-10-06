@@ -1,11 +1,8 @@
 ﻿using MediatR;
-using OpsPortal.Application.Common.Models;
+using OpsPortal.Application.Common.Queries;
 using OpsPortal.Contracts.Common;
 using OpsPortal.Contracts.SolutionStacks;
 
 namespace OpsPortal.Application.Features.SolutionStacks.Queries;
 
-public record GetAllSolutionStacks : PaginatedRequest, IRequest<PaginatedResponse<GetSolutionStackResponse>>
-{
-    public string? SearchTerm { get; init; }
-}
+public record GetAllSolutionStacks : SearchQuery, IRequest<PaginatedResponse<GetSolutionStackResponse>>;
