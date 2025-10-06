@@ -1,10 +1,14 @@
-﻿namespace OpsPortal.Domain.Entities;
+﻿using OpsPortal.Domain.Common.Utilities;
+
+namespace OpsPortal.Domain.Entities;
 
 public class SolutionStackStatus : Entity
 {
-    public string Name { get; private set; }
-
     public string? Description { get; private set; }
+
+    public bool IsSystem { get; private set; }
+
+    public string Name { get; private set; }
 
     public string Slug { get; private set; }
 
@@ -22,7 +26,18 @@ public class SolutionStackStatus : Entity
         Id = Guid.NewGuid();
         Description = description;
         Name = name;
-        // TODO: Use a proper slug generator
-        Slug = name.ToLowerInvariant().Replace(" ", "-");
+        Slug = SlugGenerator.Generate(name);
+    }
+
+    public static SolutionStackStatus CreateSystemStatus(Guid id, string name, string description, string slug)
+    {
+        return new SolutionStackStatus
+        {
+            Id = id,
+            Name = name,
+            Description = description,
+            Slug = slug,
+            IsSystem = true
+        };
     }
 }
