@@ -63,6 +63,50 @@ public class SolutionStacksController : ControllerBase
     }
 
     /// <summary>
+    ///     Retrieves a paginated list of solution stack statuses with optional sorting
+    /// </summary>
+    /// <param name="request">Query parameters for pagination and sorting</param>
+    /// <returns>A paginated response containing solution stack status data</returns>
+    /// <response code="200">Returns the paginated list of solution stack statuses</response>
+    /// <response code="400">If the query parameters are invalid</response>
+    /// <remarks>
+    ///     <b>Sample request:</b>
+    ///     GET /api/solution-stacks/statuses?pageNumber=1&amp;pageSize=20&amp;sortBy=name&amp;sortDescending=false
+    ///     <b>Query Parameters:</b>
+    ///     - **PageNumber**: Page number (default: 1, minimum: 1)
+    ///     - **PageSize**: Items per page (default: 20, maximum: 100)
+    ///     - **SortBy**: Field name to sort by (e.g., "name", "slug")
+    ///     - **SortDescending**: Sort direction (default: false for ascending)
+    ///     <b>Response:</b>
+    ///     Returns all available solution stack statuses including both system and user-defined statuses.
+    ///     The response includes pagination metadata in both the response body and HTTP headers.
+    ///     <b>Response Headers:</b>
+    ///     - <c>X-Pagination</c>: JSON object with <c>TotalCount</c>, <c>PageSize</c>, <c>PageNumber</c>, <c>TotalPages</c>,
+    ///     <c>HasNextPage</c>, <c>HasPreviousPage</c>
+    ///     - <c>Link</c>: RFC5988-compliant navigation links for <c>next</c> and <c>prev</c> pages
+    /// </remarks>
+    [HttpGet]
+    [ProducesResponseType(typeof(PaginatedResponse<GetSolutionStackStatusResponse>), StatusCodes.Status200OK)]
+    [Route("statuses")]
+    public async Task<ActionResult<PaginatedResponse<GetSolutionStackStatusResponse>>> GetAllStatuses(
+        [FromQuery]GetAllSolutionStackStatusesRequest request)
+    {
+        var query = new GetAllSolutionStackStatuses
+        {
+            PageNumber = request.PageNumber,
+            PageSize = request.PageSize,
+            SortBy = request.SortBy,
+            SortDescending = request.SortDescending
+        };
+
+        var result = await _mediator.Send(query);
+
+        Response.AddPaginationHeaders(result, Request);
+
+        return Ok(result);
+    }
+
+    /// <summary>
     ///     Retrieves a solution stack by its unique identifier.
     /// </summary>
     /// <param name="id">The unique identifier of the solution stack.</param>
