@@ -25,6 +25,7 @@ public class GetSolutionStackHandler : IRequestHandler<GetSolutionStackById, Get
                 s.Description,
                 s.Category,
                 s.Status.Name,
+                s.Status.Slug,
                 s.Owner,
                 s.CreatedAt,
                 s.UpdatedAt))

@@ -193,6 +193,7 @@ public class SolutionStacksControllerTests
                 "Description 1",
                 "Category 1",
                 "Active",
+                "active",
                 "Owner 1",
                 DateTime.UtcNow.AddDays(-10),
                 DateTime.UtcNow.AddDays(-5)),
@@ -203,6 +204,7 @@ public class SolutionStacksControllerTests
                 "Description 2",
                 "Category 2",
                 "Inactive",
+                "inactive",
                 "Owner 2",
                 DateTime.UtcNow.AddDays(-8),
                 DateTime.UtcNow.AddDays(-3))
@@ -303,6 +305,7 @@ public class SolutionStacksControllerTests
             "Description 1",
             "Category 1",
             "Active",
+            "active",
             "Owner 1",
             DateTime.UtcNow.AddDays(-10),
             DateTime.UtcNow.AddDays(-5));
