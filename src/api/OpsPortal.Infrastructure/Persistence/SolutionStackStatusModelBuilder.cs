@@ -53,6 +53,19 @@ internal class SolutionStackStatusModelBuilder : IModelBuilder
                 .WithOne(s => s.Status)
                 .HasForeignKey(s => s.StatusId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasData(
+                    SolutionStackStatus.CreateSystemStatus(
+                        Guid.Parse("11111111-1111-1111-1111-111111111111"),
+                        "Active",
+                        "The solution stack is active and available for use.",
+                        "active"),
+                    SolutionStackStatus.CreateSystemStatus(
+                        Guid.Parse("22222222-2222-2222-2222-222222222222"),
+                        "Inactive",
+                        "The solution stack is inactive and not available for use.",
+                        "inactive")
+            );
         });
     }
 }
