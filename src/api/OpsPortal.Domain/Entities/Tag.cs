@@ -1,6 +1,9 @@
-﻿namespace OpsPortal.Domain.Entities;
+﻿using OpsPortal.Domain.Common.Auditing;
+using OpsPortal.Domain.Common.Utilities;
 
-public class Tag : Entity
+namespace OpsPortal.Domain.Entities;
+
+public class Tag : AuditableEntity
 {
     public string Name { get; private set; }
     
@@ -16,10 +19,13 @@ public class Tag : Entity
     
     public bool IsActive { get; private set; }
     
-    public Guid? ParentTagId { get; private set; }
+    //public Guid? ParentTagId { get; private set; }
     
-    public virtual Tag? ParentTag { get; private set; }
+    //public virtual Tag? ParentTag { get; private set; }
 
+    // This attribute is used by EF Core to map the many-to-many relationship
+    // We will manage this collection via methods in the SolutionStack entity
+    // ReSharper disable once CollectionNeverUpdated.Local
     private readonly List<SolutionStackTag> _solutionStackTags = new();
     
     public IReadOnlyCollection<SolutionStackTag> SolutionStackTags => _solutionStackTags.AsReadOnly();
@@ -30,27 +36,23 @@ public class Tag : Entity
     private Tag() { } // EF Core
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-    public static Tag Create(string name, TagType type, string? description = null, string? color = null)
+    public static Tag Create(string name, TagType type, User createdByUser, string? description = null, string? color = null)
     {
-        return new Tag
+        var tag = new Tag
         {
             Id = Guid.NewGuid(),
             Name = name,
-            Slug = GenerateSlug(name),
+            Slug = SlugGenerator.Generate(name),
             Description = description,
             Type = type,
             Color = color ?? GenerateDefaultColor(type),
             IsSystem = false,
             IsActive = true
         };
-    }
 
-    private static string GenerateSlug(string name)
-    {
-        return name.ToLowerInvariant()
-            .Replace(" ", "-")
-            .Replace("_", "-")
-            .Replace(".", "-");
+        tag.SetCreatedAudit(createdByUser.Identifier, createdByUser.Id);
+
+        return tag;
     }
 
     private static string GenerateDefaultColor(TagType type)
