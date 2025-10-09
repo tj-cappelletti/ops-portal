@@ -1,4 +1,4 @@
-﻿namespace OpsPortal.Domain.Entities;
+﻿namespace OpsPortal.Domain.Common;
 
 public abstract class Entity
 {
