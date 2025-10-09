@@ -1,10 +1,10 @@
-﻿namespace OpsPortal.Domain.Entities;
+﻿using OpsPortal.Domain.Common.Auditing;
 
-public class SolutionStack : Entity
+namespace OpsPortal.Domain.Entities;
+
+public class SolutionStack : AuditableEntity
 {
     public string? Category { get; private set; }
-
-    public DateTime CreatedAt { get; private set; }
 
     public string? Description { get; private set; }
 
@@ -17,8 +17,6 @@ public class SolutionStack : Entity
     public SolutionStackStatus Status { get; private set; } = default!;
 
     public Guid StatusId { get; private set; }
-
-    public DateTime UpdatedAt { get; private set; }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     // Constructor for EF Core
