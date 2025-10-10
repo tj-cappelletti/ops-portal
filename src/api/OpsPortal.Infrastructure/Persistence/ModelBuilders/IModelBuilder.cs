@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace OpsPortal.Infrastructure.Persistence;
+namespace OpsPortal.Infrastructure.Persistence.ModelBuilders;
 
 internal interface IModelBuilder
 {

@@ -1,20 +1,26 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OpsPortal.Domain.Constants;
 using OpsPortal.Domain.Entities;
 
-namespace OpsPortal.Infrastructure.Persistence;
+namespace OpsPortal.Infrastructure.Persistence.ModelBuilders;
 
-internal class SolutionStackModelBuilder : IModelBuilder
+internal class SolutionStackStatusModelBuilder : IModelBuilder
 {
     private readonly IDatabaseProvider? _databaseProvider;
 
-    public SolutionStackModelBuilder(IDatabaseProvider? databaseProvider = null)
+    public SolutionStackStatusModelBuilder(IDatabaseProvider? databaseProvider = null)
     {
         _databaseProvider = databaseProvider;
     }
 
     public void BuildModel(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<SolutionStack>(entity =>
+        // TODO: Inject the authentication type from the configuration
+        var systemStatuses = SystemDefaults.Statuses.GetAllSeedData()
+            .Select(SolutionStackStatus.CreateSystemStatus)
+            .ToArray();
+
+        modelBuilder.Entity<SolutionStackStatus>(entity =>
         {
             entity.HasKey(e => e.Id);
 
@@ -28,7 +34,7 @@ internal class SolutionStackModelBuilder : IModelBuilder
 
             entity.Property(e => e.Name)
                 .IsRequired()
-                .HasMaxLength(300);
+                .HasMaxLength(100);
 
             entity.Property(e => e.Slug)
                 .IsRequired()
@@ -48,21 +54,13 @@ internal class SolutionStackModelBuilder : IModelBuilder
                 entity.Property(e => e.Description)
                     .HasColumnType("text");
 
-            // Handle datetime precision differences
-            if (_databaseProvider?.IsSqlServer == true)
-            {
-                entity.Property(e => e.CreatedAt)
-                    .HasColumnType("datetime2");
-                entity.Property(e => e.UpdatedAt)
-                    .HasColumnType("datetime2");
-            }
-            else if (_databaseProvider?.IsPostgreSql == true)
-            {
-                entity.Property(e => e.CreatedAt)
-                    .HasColumnType("timestamp with time zone");
-                entity.Property(e => e.UpdatedAt)
-                    .HasColumnType("timestamp with time zone");
-            }
+            // One-to-many relationship with SolutionStack
+            entity.HasMany(e => e.SolutionStacks)
+                .WithOne(s => s.Status)
+                .HasForeignKey(s => s.StatusId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasData(systemStatuses);
         });
     }
 }
