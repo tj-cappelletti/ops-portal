@@ -4,6 +4,10 @@ namespace OpsPortal.Domain.Entities;
 
 public class SolutionStack : AuditableEntity
 {
+    // ReSharper disable once CollectionNeverUpdated.Local
+    // EF Core requires a backing field for collections
+    private readonly List<SolutionStackTag> _solutionStackTags = [];
+
     public string? Category { get; private set; }
 
     public string? Description { get; private set; }
@@ -14,7 +18,10 @@ public class SolutionStack : AuditableEntity
 
     public string Slug { get; private set; }
 
+    public IReadOnlyCollection<SolutionStackTag> SolutionStackTags => _solutionStackTags.AsReadOnly();
+
     public SolutionStackStatus Status { get; private set; } = default!;
+
 
     public Guid StatusId { get; private set; }
 
