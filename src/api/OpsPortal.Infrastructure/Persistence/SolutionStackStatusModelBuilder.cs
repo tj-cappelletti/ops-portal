@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OpsPortal.Domain.Constants;
 using OpsPortal.Domain.Entities;
 
 namespace OpsPortal.Infrastructure.Persistence;
@@ -14,6 +15,11 @@ internal class SolutionStackStatusModelBuilder : IModelBuilder
 
     public void BuildModel(ModelBuilder modelBuilder)
     {
+        // TODO: Inject the authentication type from the configuration
+        var systemStatuses = SystemDefaults.Statuses.GetAllSeedData()
+            .Select(SolutionStackStatus.CreateSystemStatus)
+            .ToArray();
+
         modelBuilder.Entity<SolutionStackStatus>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -54,18 +60,7 @@ internal class SolutionStackStatusModelBuilder : IModelBuilder
                 .HasForeignKey(s => s.StatusId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasData(
-                    SolutionStackStatus.CreateSystemStatus(
-                        Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                        "Active",
-                        "The solution stack is active and available for use.",
-                        "active"),
-                    SolutionStackStatus.CreateSystemStatus(
-                        Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                        "Inactive",
-                        "The solution stack is inactive and not available for use.",
-                        "inactive")
-            );
+            entity.HasData(systemStatuses);
         });
     }
 }
