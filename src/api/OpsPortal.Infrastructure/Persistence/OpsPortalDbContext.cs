@@ -12,6 +12,10 @@ public class OpsPortalDbContext : DbContext, IApplicationDbContext
 
     public DbSet<SolutionStackStatus> SolutionStackStatuses => Set<SolutionStackStatus>();
 
+    public DbSet<Tag> Tags => Set<Tag>();
+
+    public DbSet<User> Users => Set<User>();
+
     public OpsPortalDbContext(
         DbContextOptions<OpsPortalDbContext> options,
         IDatabaseProvider? databaseProvider = null)
@@ -47,12 +51,16 @@ public class OpsPortalDbContext : DbContext, IApplicationDbContext
             instance?.BuildModel(modelBuilder);
         }
 
+#if DEBUG
         // Seed data (works for all providers)
         if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development") SeedData(modelBuilder);
+#endif
     }
 
+#if DEBUG
     private void SeedData(ModelBuilder modelBuilder)
     {
         // Seed data implementation...
     }
+#endif
 }
