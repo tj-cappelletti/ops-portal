@@ -24,7 +24,7 @@ public class Startup
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            // Ensure database is created in development67
+            // Ensure database is created in development
             using var scope = app.ApplicationServices.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<OpsPortalDbContext>();
             dbContext.Database.EnsureCreated();
