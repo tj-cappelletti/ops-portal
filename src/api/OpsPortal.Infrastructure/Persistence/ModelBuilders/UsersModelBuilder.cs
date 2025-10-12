@@ -5,11 +5,11 @@ using OpsPortal.Domain.Entities;
 
 namespace OpsPortal.Infrastructure.Persistence.ModelBuilders;
 
-internal class UsersModelBuilder : IModelBuilder
+public class UsersModelBuilder : IModelBuilder
 {
-    private IDatabaseProvider _databaseProvider;
+    private IOpsPortalDatabaseProvider _databaseProvider;
 
-    public UsersModelBuilder(IDatabaseProvider databaseProvider)
+    public UsersModelBuilder(IOpsPortalDatabaseProvider databaseProvider)
     {
         _databaseProvider = databaseProvider;
     }
