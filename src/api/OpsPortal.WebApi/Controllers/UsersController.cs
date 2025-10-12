@@ -34,4 +34,18 @@ public class UsersController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetUserById(Guid id)
+    {
+        var query = new GetUserById(id);
+
+        var user = await _mediator.Send(query);
+
+        if (user == null) return NotFound();
+
+        return Ok(user);
+    }
 }
