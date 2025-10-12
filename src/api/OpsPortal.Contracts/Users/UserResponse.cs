@@ -21,7 +21,6 @@ public record UserResponse(
     DateTime? LockedUntil,
     int LoginCount,
     DateTime? PasswordChangedAt,
-    string? PasswordHash,
     string? Preferences,
     string? RefreshToken,
     DateTime? RefreshTokenExpiry,
