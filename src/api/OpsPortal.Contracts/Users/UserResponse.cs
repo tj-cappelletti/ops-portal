@@ -22,7 +22,6 @@ public record UserResponse(
     int LoginCount,
     DateTime? PasswordChangedAt,
     string? Preferences,
-    string? RefreshToken,
     DateTime? RefreshTokenExpiry,
     bool? RequirePasswordChange,
     string Status,
