@@ -31,7 +31,7 @@ public class GetAllUsersHandler : IRequestHandler<GetAllUsers, PaginatedResponse
         }
 
         // Get total count before pagination
-        var totalCount = query.Count();
+        var totalCount = await query.CountAsync(cancellationToken);
 
         // Apply sorting
         query = request.SortBy?.ToLower() switch
