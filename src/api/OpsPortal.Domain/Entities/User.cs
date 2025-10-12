@@ -24,8 +24,8 @@ public class User : AuditableEntity
     public string Identifier { get; private init; } // Username or Email depending on authentication mode
 
     public string? IdentityProvider { get; private set; }
-    
-    public bool IsDeleted { get; } // Soft delete flag
+
+    public bool IsDeleted { get; private set; } // Soft delete flag
 
     public bool IsLocked { get; private set; }
 
@@ -47,17 +47,17 @@ public class User : AuditableEntity
 
     public string? PasswordHash { get; private set; }
 
-    public string? Preferences { get; } // JSON for UI preferences
+    public string? Preferences { get; private set; } = null; // JSON for UI preferences
 
-    public string? RefreshToken { get; }
+    public string? RefreshToken { get; private set; } = null;
 
-    public DateTime? RefreshTokenExpiry { get; }
+    public DateTime? RefreshTokenExpiry { get; private set; } = null;
 
     public bool? RequirePasswordChange { get; private set; }
 
     public UserStatus Status { get; private set; }
 
-    public string? TimeZone { get; }
+    public string? TimeZone { get; private set; } = null;
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     // Constructor for EF Core
@@ -151,10 +151,17 @@ public class User : AuditableEntity
             IsLocked = true, // Prevent login
             PasswordHash = null, // No password
             CreatedAt = SystemDefaults.BaseDateTime,
-            UpdatedAt = SystemDefaults.BaseDateTime,
             CreatedBy = email, // Self-created
-            CreatedById = id
+            CreatedById = id,
+            UpdatedAt = SystemDefaults.BaseDateTime,
+            UpdatedBy = email, // Self-updated
+            UpdatedById = id
         };
+    }
+
+    public void Delete()
+    {
+        IsDeleted = true;
     }
 
     private static bool IsValidEmail(string email)
@@ -189,6 +196,11 @@ public class User : AuditableEntity
         FailedLoginAttempts = 0;
         IsLocked = false;
         LockedUntil = null;
+    }
+
+    public void Restore()
+    {
+        IsDeleted = false;
     }
 
     public void Unlock()
