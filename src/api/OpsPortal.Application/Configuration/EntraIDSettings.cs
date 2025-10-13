@@ -1,6 +1,8 @@
 ﻿namespace OpsPortal.Application.Configuration;
 
-public class EntraIdSettings
+// Entra ID is the proper name, this still meets C# naming conventions
+// ReSharper disable once InconsistentNaming
+public class EntraIDSettings
 {
     public string CallbackPath { get; set; } = "/signin-oidc";
     

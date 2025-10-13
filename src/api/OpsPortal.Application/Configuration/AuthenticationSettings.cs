@@ -4,7 +4,9 @@ public class AuthenticationSettings
 {
     public const string SectionName = "Authentication";
 
-    public EntraIdSettings? EntraId { get; set; }
+    // Entra ID is the proper name, this still meets C# naming conventions
+    // ReSharper disable once InconsistentNaming
+    public EntraIDSettings? EntraID { get; set; }
 
     public JwtSettings Jwt { get; set; } = new JwtSettings();
 
@@ -22,10 +24,10 @@ public class AuthenticationSettings
                 break;
             
             case AuthenticationMode.AzureAd:
-                if (EntraId == null)
+                if (EntraID == null)
                     throw new InvalidOperationException("Azure AD settings are required when Mode is AzureAd");
 
-                EntraId.Validate();
+                EntraID.Validate();
                 break;
             
             default:
