@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using OpsPortal.Application.Authentication.Models;
 using OpsPortal.Application.Authentication.Services;
 using OpsPortal.Contracts.Authentication;
 using OpsPortal.Domain.Entities;
@@ -27,8 +28,22 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
             cancellationToken);
 
         if (!authResult.Succeeded)
-            //throw new UnauthorizedException(authResult.Error);
-            throw new Exception(authResult.Error);
+        {
+            var message = authResult.FailureReason switch
+            {
+                AuthenticationFailureReason.AccountLocked => "Account is locked",
+                AuthenticationFailureReason.AccountDisabled => "Account is disabled",
+                AuthenticationFailureReason.PasswordExpired => "Password change required",
+                AuthenticationFailureReason.RequiresTwoFactor => "Two-factor authentication required",
+                AuthenticationFailureReason.EmailNotVerified => "Email address is not verified",
+                _ => "Invalid credentials",
+            };
+
+            return new LoginResponse
+            {
+                Message = message
+            };
+        }
 
         // Convert to external contract
         var tokenResult = await _jwtService.GenerateTokenAsync(authResult.User!, cancellationToken);
