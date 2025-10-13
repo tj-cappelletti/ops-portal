@@ -13,6 +13,8 @@ public interface IApplicationDbContext
 
     //DbSet<Tag> Tags { get; }
 
+    DbSet<RefreshToken> RefreshTokens { get; }
+
     DbSet<User> Users { get; }
 
     int SaveChanges();

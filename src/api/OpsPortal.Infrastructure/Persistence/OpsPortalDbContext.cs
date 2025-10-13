@@ -17,6 +17,8 @@ public class OpsPortalDbContext : DbContext, IApplicationDbContext
 
     //public DbSet<Tag> Tags => Set<Tag>();
 
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+
     public DbSet<User> Users => Set<User>();
 
     public OpsPortalDbContext(
