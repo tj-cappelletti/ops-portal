@@ -5,6 +5,12 @@ using OpsPortal.Application;
 using OpsPortal.Application.Common.Interfaces;
 using OpsPortal.Infrastructure.Persistence;
 using System.Reflection;
+using OpsPortal.Application.Authentication.Services;
+using OpsPortal.Application.Http;
+using OpsPortal.Application.Security;
+using OpsPortal.Infrastructure.Authentication.Services;
+using OpsPortal.Infrastructure.Security;
+using OpsPortal.WebApi.Services;
 
 namespace OpsPortal.WebApi.Extensions;
 
@@ -139,8 +145,11 @@ public static class ServiceCollectionExtensions
         services.AddHttpContextAccessor();
 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<OpsPortalDbContext>());
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
+        services.AddScoped<ICurrentHttpContext, CurrentHttpContext>();
+        services.AddScoped<IJwtService, JwtService>();
+        services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
         //services.AddScoped<IAuditUserService, AuditUserService>();
-        //services.AddScoped<ICurrentHttpContext, CurrentHttpContext>();
 
         return services;
     }
