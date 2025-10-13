@@ -15,4 +15,19 @@ public class EntraIdSettings
     public string SignedOutCallbackPath { get; set; } = "/signout-callback-oidc";
     
     public string TenantId { get; set; } = string.Empty;
+
+    public void Validate()
+    {
+        if (string.IsNullOrWhiteSpace(ClientId))
+            throw new InvalidOperationException("Entra ID ClientId is required.");
+
+        if (string.IsNullOrWhiteSpace(ClientSecret))
+            throw new InvalidOperationException("Entra ID ClientSecret is required.");
+
+        if (string.IsNullOrWhiteSpace(Domain))
+            throw new InvalidOperationException("Entra ID Domain is required.");
+
+        if (string.IsNullOrWhiteSpace(TenantId))
+            throw new InvalidOperationException("Entra ID TenantId is required.");
+    }
 }

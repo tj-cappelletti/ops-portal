@@ -1,4 +1,4 @@
-﻿namespace OpsPortal.Application.Common.Configuration;
+﻿namespace OpsPortal.Application.Configuration;
 
 public class JwtSettings
 {
@@ -25,4 +25,21 @@ public class JwtSettings
     public bool ValidateIssuerSigningKey { get; set; } = true;
 
     public bool ValidateLifetime { get; set; } = true;
+
+    public void Validate()
+    {
+        if (string.IsNullOrWhiteSpace(Secret))
+            throw new InvalidOperationException("JWT Secret is required.");
+
+        if (string.IsNullOrWhiteSpace(Issuer))
+            throw new InvalidOperationException("JWT Issuer is required.");
+
+        if (string.IsNullOrWhiteSpace(Audience))
+            throw new InvalidOperationException("JWT Audience is required.");
+
+        var validAlgorithms = new[] { "HS256", "HS384", "HS512" };
+
+        if (!validAlgorithms.Contains(Algorithm))
+            throw new InvalidOperationException($"Invalid JWT Algorithm. Supported algorithms are: {string.Join(", ", validAlgorithms)}");
+    }
 }
