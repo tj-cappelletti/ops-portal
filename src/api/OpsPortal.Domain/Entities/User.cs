@@ -181,11 +181,9 @@ public class User : AuditableEntity
         LockedUntil = DateTime.UtcNow.Add(duration);
     }
 
-    public void RecordFailedLoginAttempt(int maxFailedAttempts, TimeSpan lockoutDuration)
+    public void RecordFailedLoginAttempt()
     {
         FailedLoginAttempts++;
-
-        if (FailedLoginAttempts >= maxFailedAttempts) LockAccount(lockoutDuration);
     }
 
     public void RecordLogin(string? ipAddress)
@@ -208,6 +206,11 @@ public class User : AuditableEntity
         IsLocked = false;
         LockedUntil = null;
         FailedLoginAttempts = 0;
+    }
+
+    public void SetRequirePasswordChange()
+    {
+        RequirePasswordChange = true;
     }
 
     private void UpdateFromClaims(Dictionary<string, object> claims)
