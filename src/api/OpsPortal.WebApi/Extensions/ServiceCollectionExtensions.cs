@@ -6,6 +6,7 @@ using OpsPortal.Application.Common.Interfaces;
 using OpsPortal.Infrastructure.Persistence;
 using System.Reflection;
 using OpsPortal.Application.Authentication.Services;
+using OpsPortal.Application.Configuration;
 using OpsPortal.Application.Http;
 using OpsPortal.Application.Security;
 using OpsPortal.Infrastructure.Authentication.Services;
@@ -46,6 +47,20 @@ public static class ServiceCollectionExtensions
                 }
             });
         });
+
+        return services;
+    }
+
+    public static IServiceCollection AddOpsPortalConfiguration(this IServiceCollection services, IConfiguration configuration)
+    {
+        var authSettings = configuration.GetSection("Authentication").Get<AuthenticationSettings>();
+
+        if (authSettings == null)
+            throw new InvalidOperationException("Authentication settings are missing in configuration.");
+
+        authSettings.Validate();
+
+        services.AddSingleton(authSettings);
 
         return services;
     }

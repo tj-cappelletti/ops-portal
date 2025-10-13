@@ -69,6 +69,7 @@ public class Startup
         services.AddOpsPortalSwagger();
 
         // Use extension methods for complex configurations
+        services.AddOpsPortalConfiguration(_configuration);
         services.AddOpsPortalDatabase(_configuration, _environment);
         services.AddOpsPortalMediatR();
         services.AddOpsPortalServices();
