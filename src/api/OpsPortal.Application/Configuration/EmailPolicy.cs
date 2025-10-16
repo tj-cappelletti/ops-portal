@@ -2,6 +2,8 @@
 
 public class EmailPolicy
 {
+    public bool AllowAnyDomain => AllowedDomains.Count == 0;
+
     public List<string> AllowedDomains { get; set; } = []; // Empty = all allowed
 
     public List<string> BlockedDomains { get; set; } = [];
