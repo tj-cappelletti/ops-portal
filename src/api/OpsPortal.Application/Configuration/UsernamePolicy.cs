@@ -8,7 +8,7 @@ public class UsernamePolicy
 
     public int MinLength { get; set; } = 3;
 
-    public string Pattern { get; set; } = @"^[a-zA-Z0-9_-]+$";
+    public string Pattern { get; set; } = "^[a-zA-Z0-9_-]+$";
 
     public string PatternDescription { get; set; } = "Letters, numbers, dash, and underscore only";
 
