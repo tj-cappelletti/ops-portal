@@ -14,20 +14,30 @@ public abstract class AuditableEntity : Entity, IAuditableEntity
 
     public Guid UpdatedById { get; protected set; }
 
-    public void SetCreatedAudit(string userIdentifier, Guid userId)
+    internal void SetCreatedAudit(string userIdentifier, Guid userId, DateTime timestamp)
     {
-        CreatedAt = DateTime.UtcNow;
+        CreatedAt = timestamp;
         CreatedBy = userIdentifier;
         CreatedById = userId;
-        UpdatedAt = CreatedAt;
+        UpdatedAt = timestamp;
+        UpdatedBy = userIdentifier;
+        UpdatedById = userId;
+    }
+
+    public void SetCreatedAudit(string userIdentifier, Guid userId)
+    {
+        SetCreatedAudit(userIdentifier, userId, DateTime.UtcNow);
+    }
+
+    internal void SetUpdatedAudit(string userIdentifier, Guid userId, DateTime timestamp)
+    {
+        UpdatedAt = timestamp;
         UpdatedBy = userIdentifier;
         UpdatedById = userId;
     }
 
     public void SetUpdatedAudit(string userIdentifier, Guid userId)
     {
-        UpdatedAt = DateTime.UtcNow;
-        UpdatedBy = userIdentifier;
-        UpdatedById = userId;
+        SetUpdatedAudit(userIdentifier, userId, DateTime.UtcNow);
     }
 }
