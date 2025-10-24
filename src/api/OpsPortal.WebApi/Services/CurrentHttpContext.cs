@@ -13,7 +13,8 @@ public class CurrentHttpContext : ICurrentHttpContext
 
     public string? GetClaim(string claimType)
     {
-        throw new NotImplementedException();
+        // TODO: Implement claim retrieval
+        return null;
     }
 
     public string? GetIpAddress()
@@ -44,6 +45,7 @@ public class CurrentHttpContext : ICurrentHttpContext
 
     public bool IsAuthenticated()
     {
-        throw new NotImplementedException();
+        // TODO: Implement authentication check
+        return false;
     }
 }
