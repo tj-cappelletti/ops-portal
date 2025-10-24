@@ -1,5 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using OpsPortal.Application.Users.Commands;
 using OpsPortal.Application.Users.Queries;
 using OpsPortal.Contracts.Common;
 using OpsPortal.Contracts.Users;
@@ -8,13 +10,39 @@ namespace OpsPortal.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController : ControllerBase
+public class UsersController : ApiControllerBase<UsersController>
 {
-    public readonly IMediator _mediator;
+    private readonly IMediator _mediator;
 
-    public UsersController(IMediator mediator)
+    public UsersController(ILogger<UsersController> logger, IMediator mediator) : base(logger)
     {
         _mediator = mediator;
+    }
+
+    [HttpPost("local")]
+    [ProducesResponseType(typeof(UserResponse), StatusCodes.Status201Created)]
+    public async Task<IActionResult> CreateLocalUser([FromBody]CreateLocalUserRequest request)
+    {
+
+        var command = new CreateLocalUserCommand(
+            request.AvatarUrl,
+            request.DisplayName,
+            request.Email,
+            request.FirstName,
+            request.Identifier,
+            request.LastName,
+            request.Locale,
+            request.Password,
+            request.RequirePasswordChange,
+            request.TimeZone);
+
+        var operationResult = await _mediator.Send(command);
+
+        // The operationResult.value will be non-null if IsSuccess is true
+        // If it is null, let it throw to be caught by the global exception handler
+        return operationResult.IsSuccess
+            ? CreatedAtAction(nameof(GetUserById), new { id = operationResult.Value!.Id }, operationResult.Value)
+            : HandleOperationError(operationResult.Error);
     }
 
     [HttpGet]
