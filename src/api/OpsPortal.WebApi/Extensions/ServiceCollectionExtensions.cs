@@ -1,22 +1,39 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 using OpsPortal.Application;
-using OpsPortal.Application.Common.Interfaces;
-using OpsPortal.Infrastructure.Persistence;
-using System.Reflection;
 using OpsPortal.Application.Authentication.Services;
+using OpsPortal.Application.Common.Behaviors;
+using OpsPortal.Application.Common.Interfaces;
 using OpsPortal.Application.Configuration;
 using OpsPortal.Application.Http;
 using OpsPortal.Application.Security;
+using OpsPortal.Application.Users.Services;
 using OpsPortal.Infrastructure.Authentication.Services;
+using OpsPortal.Infrastructure.Persistence;
 using OpsPortal.Infrastructure.Security;
 using OpsPortal.WebApi.Services;
+using System.Reflection;
 
 namespace OpsPortal.WebApi.Extensions;
 
 public static class ServiceCollectionExtensions
 {
+    public static IServiceCollection AddOpsPortalConfiguration(this IServiceCollection services, IConfiguration configuration)
+    {
+        var authSettings = configuration.GetSection("Authentication").Get<AuthenticationSettings>();
+
+        if (authSettings == null)
+            throw new InvalidOperationException("Authentication settings are missing in configuration.");
+
+        authSettings.Validate();
+
+        services.AddSingleton(authSettings);
+
+        return services;
+    }
+
     public static IServiceCollection AddOpsPortalCors(
         this IServiceCollection services,
         IConfiguration configuration,
@@ -47,20 +64,6 @@ public static class ServiceCollectionExtensions
                 }
             });
         });
-
-        return services;
-    }
-
-    public static IServiceCollection AddOpsPortalConfiguration(this IServiceCollection services, IConfiguration configuration)
-    {
-        var authSettings = configuration.GetSection("Authentication").Get<AuthenticationSettings>();
-
-        if (authSettings == null)
-            throw new InvalidOperationException("Authentication settings are missing in configuration.");
-
-        authSettings.Validate();
-
-        services.AddSingleton(authSettings);
 
         return services;
     }
@@ -143,10 +146,9 @@ public static class ServiceCollectionExtensions
         {
             // Register from the Application assembly where handlers live
             cfg.RegisterServicesFromAssembly(typeof(AssemblyReference).Assembly);
-
-            // Or if you don't have an AssemblyReference marker class:
-            // cfg.RegisterServicesFromAssemblyContaining<GetAllSolutionStacksHandler>();
         });
+
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ActionContextBehavior<,>));
 
         return services;
     }
@@ -156,7 +158,7 @@ public static class ServiceCollectionExtensions
         // Register all application services
         // services.AddScoped<ISolutionStackRepository, SolutionStackRepository>();
         // services.AddScoped<IGitHubService, GitHubService>();
-        
+
         services.AddHttpContextAccessor();
 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<OpsPortalDbContext>());
@@ -164,6 +166,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICurrentHttpContext, CurrentHttpContext>();
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+        services.AddScoped< IUserValidationService, UserValidationService>();
         //services.AddScoped<IAuditUserService, AuditUserService>();
 
         return services;
