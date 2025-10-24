@@ -2,7 +2,7 @@
 
 public class LocalAuthSettings
 {
-    public PasswordPolicy PasswordPolicy { get; set; } = new();
+    public UserIdentifierMode UserIdentifierMode { get; set; } = UserIdentifierMode.Flexible;
 
-    public UserIdentificationSettings UserIdentification { get; set; } = new();
+    public UsernamePolicy UsernamePolicy { get; set; } = new();
 }

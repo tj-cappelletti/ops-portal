@@ -3,6 +3,6 @@
 public enum AuthenticationMode
 {
     Local,
-    AzureAd
+    EntraID
     // Future: Okta, Auth0, etc.
 }
