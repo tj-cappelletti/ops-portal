@@ -4,6 +4,10 @@ using OpsPortal.Contracts.Common;
 
 namespace OpsPortal.WebApi.Extensions;
 
+// Disable warning about using Headers.Add instead of Append or the indexer
+// If these headers already exist, this is a duplicate operation,
+// which is an issue that needs to be fixed
+#pragma warning disable ASP0019 // Use IHeaderDictionary.Append or the indexer to append or set headers.
 public static class HttpResponseExtensions
 {
     public static void AddPaginationHeaders<T>(
@@ -22,7 +26,9 @@ public static class HttpResponseExtensions
             paginatedResponse.HasPreviousPage
         };
 
+
         response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
+
 
         // Build Link header
         var links = new List<string>();
@@ -37,7 +43,7 @@ public static class HttpResponseExtensions
     private static string CreateLinkHeader(HttpRequest request, int pageNumber, int pageSize, string rel)
     {
         var baseUrl = $"{request.Scheme}://{request.Host}{request.Path}";
-        
+
         var queryParams = QueryHelpers.ParseQuery(request.QueryString.Value);
         queryParams["pageNumber"] = pageNumber.ToString();
         queryParams["pageSize"] = pageSize.ToString();
@@ -49,3 +55,4 @@ public static class HttpResponseExtensions
         return $"<{url}>; rel=\"{rel}\"";
     }
 }
+#pragma warning restore ASP0019 // Use IHeaderDictionary.Append or the indexer to append or set headers.
