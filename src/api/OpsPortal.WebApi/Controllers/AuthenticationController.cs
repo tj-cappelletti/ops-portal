@@ -31,7 +31,7 @@ public class AuthenticationController : ControllerBase
         {
             Mode = _authSettings.Mode.ToString(),
             SsoEnabled = _authSettings.Mode != AuthenticationMode.Local,
-            SsoLoginUrl = _authSettings.Mode == AuthenticationMode.AzureAd ? "/signin-oidc" : null
+            SsoLoginUrl = _authSettings.Mode == AuthenticationMode.EntraID ? "/signin-oidc" : null
         });
     }
 
