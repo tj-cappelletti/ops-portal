@@ -71,23 +71,10 @@ public class User : AuditableEntity
         string? email,
         string displayName,
         string passwordHash,
-        bool identifierIsEmail,
+        bool requirePasswordChange,
         User createdByUser)
     {
-        // If identifier is an email, store it in both fields
-        if (identifierIsEmail)
-        {
-            if (!IsValidEmail(identifier))
-                throw new Exception("Invalid email format");
-
-            email = identifier.ToLowerInvariant();
-        }
-        else
-        {
-            // Username mode - validate username format
-            if (!IsValidUsername(identifier))
-                throw new Exception("Username must be 3-50 characters, alphanumeric with - and _");
-        }
+        var timestamp = DateTime.UtcNow;
 
         var user = new User
         {
@@ -95,43 +82,40 @@ public class User : AuditableEntity
             Identifier = identifier.ToLowerInvariant(),
             Email = email?.ToLowerInvariant(),
             DisplayName = displayName,
+            PasswordChangedAt = timestamp,
             PasswordHash = passwordHash,
+            RequirePasswordChange = requirePasswordChange,
             Status = UserStatus.Active,
             IsLocked = false
         };
 
-        user.SetCreatedAudit(createdByUser.Identifier, createdByUser.Id);
+        user.SetCreatedAudit(createdByUser.Identifier, createdByUser.Id, timestamp);
 
         return user;
     }
 
     // Factory method for SSO users - email required
-    public static User CreateSsoUser(
-        string email,
-        string displayName,
-        string externalId,
-        string identityProvider,
-        Dictionary<string, object>? claims = null)
-    {
-        if (!IsValidEmail(email))
-            throw new Exception("Valid email required for SSO users");
+    //public static User CreateSsoUser(
+    //    string email,
+    //    string displayName,
+    //    string externalId,
+    //    string identityProvider,
+    //    Dictionary<string, object>? claims = null)
+    //{
+    //    var user = new User
+    //    {
+    //        Id = Guid.NewGuid(),
+    //        Identifier = email.ToLowerInvariant(), // For SSO, identifier = email
+    //        Email = email.ToLowerInvariant(),
+    //        DisplayName = displayName,
+    //        ExternalId = externalId,
+    //        IdentityProvider = identityProvider,
+    //        Status = UserStatus.Active,
+    //        IsLocked = false
+    //    };
 
-        var user = new User
-        {
-            Id = Guid.NewGuid(),
-            Identifier = email.ToLowerInvariant(), // For SSO, identifier = email
-            Email = email.ToLowerInvariant(),
-            DisplayName = displayName,
-            ExternalId = externalId,
-            IdentityProvider = identityProvider,
-            Status = UserStatus.Active,
-            IsLocked = false
-        };
-
-        if (claims != null) user.UpdateFromClaims(claims);
-
-        return user;
-    }
+    //    return user;
+    //}
 
 
     public static User CreateSystemUser(
@@ -162,17 +146,6 @@ public class User : AuditableEntity
     public void Delete()
     {
         IsDeleted = true;
-    }
-
-    private static bool IsValidEmail(string email)
-    {
-        return Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
-    }
-
-    private static bool IsValidUsername(string username)
-    {
-        // 3-50 chars, alphanumeric plus dash and underscore
-        return Regex.IsMatch(username, @"^[a-zA-Z0-9_-]{3,50}$");
     }
 
     public void LockAccount(TimeSpan duration)
@@ -211,25 +184,6 @@ public class User : AuditableEntity
     public void SetRequirePasswordChange()
     {
         RequirePasswordChange = true;
-    }
-
-    private void UpdateFromClaims(Dictionary<string, object> claims)
-    {
-        // Update user info from SSO claims
-        if (claims.TryGetValue("given_name", out var firstName))
-            FirstName = firstName.ToString();
-
-        if (claims.TryGetValue("family_name", out var lastName))
-            LastName = lastName.ToString();
-
-        if (claims.TryGetValue("picture", out var avatar))
-            AvatarUrl = avatar.ToString();
-
-        if (claims.TryGetValue("locale", out var locale))
-            Locale = locale.ToString();
-
-        // Store raw claims for provider-specific data
-        ExternalMetadata = JsonSerializer.Serialize(claims);
     }
 
     public void UpdatePasswordHash(string newHash)
