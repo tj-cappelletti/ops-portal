@@ -1,4 +1,6 @@
-﻿namespace OpsPortal.Application.Common;
+﻿using System.Text;
+
+namespace OpsPortal.Application.Common;
 
 public class OperationError
 {
@@ -17,6 +19,25 @@ public class OperationError
         Code = code;
         Message = message;
         Category = category;
+    }
+
+    public override string ToString()
+    {
+        var stringBuilder = new StringBuilder();
+        stringBuilder.AppendLine($"Code: {Code}");
+        stringBuilder.AppendLine($"Message: {Message}");
+        stringBuilder.AppendLine($"Category: {Category}");
+        
+        if (Metadata != null)
+        {
+            stringBuilder.AppendLine("Metadata:");
+            foreach (var kvp in Metadata)
+            {
+                stringBuilder.AppendLine($"  {kvp.Key}: {kvp.Value}");
+            }
+        }
+
+        return stringBuilder.ToString();
     }
 
     public static OperationError CreateBusinessRuleViolationOperationError(string message, object? details = null)
