@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OpsPortal.Application.Common;
+using OpsPortal.WebApi.Middleware;
 
 namespace OpsPortal.WebApi.Controllers;
 
 public abstract class ApiControllerBase<TController> : ControllerBase
 {
     protected ILogger<TController> Logger;
+
+    public string? CorrelationId => (string?)HttpContext.Items[CorrelationIdMiddleware.CorrelationIdContextKey];
 
     protected ApiControllerBase(ILogger<TController> logger)
     {
@@ -14,6 +17,8 @@ public abstract class ApiControllerBase<TController> : ControllerBase
 
     private ProblemDetails CreateProblemDetails(OperationError error)
     {
+        Logger.LogInformation("Operation failed with error code '{errorCode}'", error.Code);
+        Logger.LogDebug("Operation failed with error details: {errorDetails}", error);
         return new ProblemDetails
         {
             Title = error.Code,
