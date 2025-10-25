@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using OpsPortal.Infrastructure.Persistence;
 using OpsPortal.WebApi.Extensions;
+using OpsPortal.WebApi.Middleware;
 
 namespace OpsPortal.WebApi;
 
@@ -35,6 +36,8 @@ public class Startup
             app.UseExceptionHandler("/error");
             app.UseHsts();
         }
+
+        app.UseMiddleware<CorrelationIdMiddleware>();
 
         app.UseHttpsRedirection();
 
