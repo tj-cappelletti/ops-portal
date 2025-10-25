@@ -2,8 +2,11 @@
 
 public class CorrelationIdMiddleware
 {
-    private const string CorrelationIdHeaderName = "X-Correlation-Id";
-    private const string RequestIdHeaderName = "X-Request-Id";
+    public const string CorrelationIdContextKey = "CorrelationId";
+    public const string CorrelationIdHeaderName = "X-Correlation-Id";
+    public const string RequestIdHeaderName = "X-Request-Id";
+    public const string TraceIdContextKey = "TraceId";
+
     private readonly ILogger<CorrelationIdMiddleware> _logger;
     private readonly RequestDelegate _next;
 
@@ -37,8 +40,8 @@ public class CorrelationIdMiddleware
         // Add to logging scope
         using (_logger.BeginScope(new Dictionary<string, object>
                {
-                   ["CorrelationId"] = correlationId,
-                   ["TraceId"] = context.TraceIdentifier
+                   [CorrelationIdContextKey] = correlationId,
+                   [TraceIdContextKey] = context.TraceIdentifier
                }))
         {
             try
