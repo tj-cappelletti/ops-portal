@@ -24,18 +24,19 @@ public class CreateLocalUserCommandHandler : IRequestHandler<CreateLocalUserComm
 
     public async Task<OperationResult<UserResponse>> Handle(CreateLocalUserCommand request, CancellationToken cancellationToken)
     {
-        if(request.ActionContext == null)
-            throw new Exception("ActionContext is required to create a user");
+        if (request.ActionContext == null)
+            return OperationResult<UserResponse>.Failure(
+                OperationError.CreateInternalOperationError("ActionContextMissing", "The action context is missing from the request."));
 
         var validationResult = await _userValidationService.ValidateUserBusinessRulesAsync(request);
 
         if (!validationResult.IsValid)
         {
             var errors = validationResult.Errors
-                .GroupBy(e => e.Code)
+                .GroupBy(businessValidationError => businessValidationError.Code)
                 .ToDictionary(
-                    g => g.Key,
-                    g => g.Select(e => e.Message).ToArray());
+                    grouping => grouping.Key,
+                    grouping => grouping.Select(businessValidationError => businessValidationError.Message).ToArray());
 
             var operationError = OperationError.CreateValidationFailedOperationError(errors);
 
