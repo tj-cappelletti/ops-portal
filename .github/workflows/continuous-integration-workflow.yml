@@ -1,0 +1,24 @@
+name: Continuous Integration Workflow
+
+on:
+  push:
+    paths:
+      - 'src/api/**'
+
+jobs:
+  gitVersionJob:
+    name: CI - GitVersion Workflow
+    uses: webstorm-tech/workflows/.github/workflows/gitversion-workflow.yml@v5
+
+  buildAndTestJob:
+    name: CI - Build and Test Workflow
+    needs: gitVersionJob
+    uses: webstorm-tech/workflows/.github/workflows/dotnet-build-app-workflow.yml@v5
+    with:
+      artifactName: web-api
+      dotnetVersion: '9.0.x'
+      semVer: ${{ needs.gitVersionJob.outputs.semVer }}
+      sendToCodecov: false
+      solutionFile: src/api/OpsPortal.sln
+      publishProjectFile: OpsPortal.WebApi.csproj
+      publishProjectFolder: src/api/OpsPortal.WebApi
