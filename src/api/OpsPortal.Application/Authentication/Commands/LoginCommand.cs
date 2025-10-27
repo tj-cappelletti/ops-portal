@@ -1,9 +1,10 @@
 ﻿using MediatR;
+using OpsPortal.Application.Common;
 using OpsPortal.Contracts.Authentication;
 
 namespace OpsPortal.Application.Authentication.Commands;
 
-public record LoginCommand : IRequest<LoginResponse>
+public record LoginCommand : IRequest<OperationResult<LoginResponse>>
 {
     public string Identifier { get; init; } = string.Empty;
 

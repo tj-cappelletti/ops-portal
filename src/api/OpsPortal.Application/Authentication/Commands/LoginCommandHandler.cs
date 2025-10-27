@@ -1,12 +1,13 @@
 ﻿using MediatR;
 using OpsPortal.Application.Authentication.Models;
 using OpsPortal.Application.Authentication.Services;
+using OpsPortal.Application.Common;
 using OpsPortal.Contracts.Authentication;
 using OpsPortal.Domain.Entities;
 
 namespace OpsPortal.Application.Authentication.Commands;
 
-public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
+public class LoginCommandHandler : IRequestHandler<LoginCommand, OperationResult<LoginResponse>>
 {
     private readonly IAuthenticationService _authService;
     private readonly IJwtService _jwtService;
@@ -17,7 +18,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
         _jwtService = jwtService;
     }
 
-    public async Task<LoginResponse> Handle(
+    public async Task<OperationResult<LoginResponse>> Handle(
         LoginCommand request,
         CancellationToken cancellationToken)
     {
@@ -39,10 +40,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
                 _ => "Invalid credentials",
             };
 
-            return new LoginResponse
-            {
-                Message = message
-            };
+            return OperationError.CreateUnauthorizedOperationError(message);
         }
 
         // Convert to external contract
