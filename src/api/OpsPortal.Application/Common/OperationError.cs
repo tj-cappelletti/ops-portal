@@ -21,25 +21,6 @@ public class OperationError
         Category = category;
     }
 
-    public override string ToString()
-    {
-        var stringBuilder = new StringBuilder();
-        stringBuilder.AppendLine($"Code: {Code}");
-        stringBuilder.AppendLine($"Message: {Message}");
-        stringBuilder.AppendLine($"Category: {Category}");
-        
-        if (Metadata != null)
-        {
-            stringBuilder.AppendLine("Metadata:");
-            foreach (var kvp in Metadata)
-            {
-                stringBuilder.AppendLine($"  {kvp.Key}: {kvp.Value}");
-            }
-        }
-
-        return stringBuilder.ToString();
-    }
-
     public static OperationError CreateBusinessRuleViolationOperationError(string message, object? details = null)
     {
         return new OperationError("BusinessRuleViolation", message, OperationErrorCategory.BusinessRule)
@@ -53,6 +34,11 @@ public class OperationError
     public static OperationError CreateConflictOperationError(string message)
     {
         return new OperationError("Conflict", message, OperationErrorCategory.Conflict);
+    }
+
+    public static OperationError CreateInternalOperationError(string code, string message)
+    {
+        return new OperationError(code, message, OperationErrorCategory.Internal);
     }
 
     public static OperationError CreateNotFoundOperationError(string resource, object id)
@@ -72,5 +58,21 @@ public class OperationError
         {
             Metadata = new Dictionary<string, object> { [MetadataErrorsKey] = errors }
         };
+    }
+
+    public override string ToString()
+    {
+        var stringBuilder = new StringBuilder();
+        stringBuilder.AppendLine($"Code: {Code}");
+        stringBuilder.AppendLine($"Message: {Message}");
+        stringBuilder.AppendLine($"Category: {Category}");
+
+        if (Metadata != null)
+        {
+            stringBuilder.AppendLine("Metadata:");
+            foreach (var kvp in Metadata) stringBuilder.AppendLine($"  {kvp.Key}: {kvp.Value}");
+        }
+
+        return stringBuilder.ToString();
     }
 }
