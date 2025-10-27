@@ -17,8 +17,7 @@ public abstract class ApiControllerBase<TController> : ControllerBase
 
     private ProblemDetails CreateProblemDetails(OperationError error)
     {
-        Logger.LogInformation("Operation failed with error code '{errorCode}'", error.Code);
-        Logger.LogDebug("Operation failed with error details: {errorDetails}", error);
+        Logger.LogInformation("Creating ProblemDetails");
         return new ProblemDetails
         {
             Title = error.Code,
@@ -29,6 +28,8 @@ public abstract class ApiControllerBase<TController> : ControllerBase
 
     private IActionResult CreateValidationResponse(OperationError error)
     {
+        Logger.LogInformation("Creating ValidationProblemDetails");
+
         var problemDetails = new ValidationProblemDetails
         {
             Title = "Validation Failed",
@@ -37,8 +38,15 @@ public abstract class ApiControllerBase<TController> : ControllerBase
 
         if (error.Metadata?.TryGetValue(OperationError.MetadataErrorsKey, out var errors) == true &&
             errors is Dictionary<string, string[]> validationErrors)
-            foreach (var kvp in validationErrors)
-                problemDetails.Errors[kvp.Key] = kvp.Value;
+        {
+            Logger.LogDebug("Adding validation errors to ProblemDetails: {validationErrors}", validationErrors);
+            foreach (var keyValuePair in validationErrors)
+                problemDetails.Errors[keyValuePair.Key] = keyValuePair.Value;
+        }
+        else
+        {
+            Logger.LogWarning("No validation errors found in OperationError metadata");
+        }
 
         return BadRequest(problemDetails);
     }
@@ -56,6 +64,11 @@ public abstract class ApiControllerBase<TController> : ControllerBase
             });
         }
 
+        Logger.LogInformation("Operation failed with error code '{errorCode}'", error.Code);
+        Logger.LogDebug("Operation failed with error details: {errorDetails}", error.Message);
+        foreach (var kvp in error.Metadata ?? new Dictionary<string, object>())
+            Logger.LogDebug("Error metadata - {key}: {value}", kvp.Key, kvp.Value);
+
         return error.Category switch
         {
             OperationErrorCategory.Validation => CreateValidationResponse(error),
@@ -69,8 +82,13 @@ public abstract class ApiControllerBase<TController> : ControllerBase
 
     protected IActionResult HandleOperationResult<T>(OperationResult<T> result)
     {
-        return result.IsSuccess
-            ? Ok(result.Value)
-            : HandleOperationError(result.Error!);
+        if (result.IsSuccess)
+        {
+            Logger.LogInformation("Operation succeeded");
+            return Ok(result.Value!);
+        }
+        
+        Logger.LogInformation("Operation failed");
+        return HandleOperationError(result.Error);
     }
 }
