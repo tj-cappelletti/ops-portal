@@ -1,12 +1,13 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using OpsPortal.Application.Common;
 using OpsPortal.Application.Common.Interfaces;
 using OpsPortal.Contracts.Common;
 using OpsPortal.Contracts.Users;
 
 namespace OpsPortal.Application.Users.Queries;
 
-public class GetAllUsersHandler : IRequestHandler<GetAllUsers, PaginatedResponse<UserResponse>>
+public class GetAllUsersHandler : IRequestHandler<GetAllUsers, OperationResult<PaginatedResponse<UserResponse>>>
 {
     private readonly IApplicationDbContext _context;
 
@@ -15,7 +16,7 @@ public class GetAllUsersHandler : IRequestHandler<GetAllUsers, PaginatedResponse
         _context = context;
     }
 
-    public async Task<PaginatedResponse<UserResponse>> Handle(GetAllUsers request, CancellationToken cancellationToken)
+    public async Task<OperationResult<PaginatedResponse<UserResponse>>> Handle(GetAllUsers request, CancellationToken cancellationToken)
     {
         var query = _context.Users.AsQueryable();
 
@@ -77,6 +78,7 @@ public class GetAllUsersHandler : IRequestHandler<GetAllUsers, PaginatedResponse
             ))
             .ToListAsync(cancellationToken);
 
-        return PaginatedResponse<UserResponse>.Create(users, request.PageNumber, request.PageSize, totalCount);
+        return OperationResult<PaginatedResponse<UserResponse>>.Success(
+            PaginatedResponse<UserResponse>.Create(users, request.PageNumber, request.PageSize, totalCount));
     }
 }
