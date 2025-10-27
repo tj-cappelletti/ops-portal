@@ -11,6 +11,8 @@ namespace OpsPortal.WebApi.Controllers;
 [Route("api/[controller]")]
 public class UsersController : ApiControllerBase<UsersController>
 {
+    private const string OperationName = nameof(UsersController);
+
     private readonly IMediator _mediator;
 
     public UsersController(ILogger<UsersController> logger, IMediator mediator) : base(logger)
@@ -24,7 +26,8 @@ public class UsersController : ApiControllerBase<UsersController>
     {
         var loggerState = new Dictionary<string, object>
         {
-            ["Operation"] = nameof(CreateLocalUser),
+            ["Operation"] = $"{OperationName}-{nameof(CreateLocalUser)}",
+            ["Identifier"] = request.Identifier,
             ["Email"] = request.Email ?? string.Empty,
             ["RequestId"] = HttpContext.TraceIdentifier,
             ["CorrelationId"] = CorrelationId ?? HttpContext.TraceIdentifier,
@@ -70,18 +73,59 @@ public class UsersController : ApiControllerBase<UsersController>
     [ProducesResponseType(typeof(PaginatedResponse<UserResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAllUsers([FromQuery]GetAllUsersRequest request)
     {
-        var query = new GetAllUsers
+        var loggerState = new Dictionary<string, object>
         {
-            SearchTerm = request.SearchTerm,
-            PageNumber = request.PageNumber,
-            PageSize = request.PageSize,
-            SortBy = request.SortBy,
-            SortDescending = request.SortDescending
+            ["Operation"] = $"{OperationName}-{nameof(GetAllUsers)}",
+            ["RequestId"] = HttpContext.TraceIdentifier,
+            ["CorrelationId"] = CorrelationId ?? HttpContext.TraceIdentifier,
+            ["ClientIp"] = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown"
         };
 
-        var result = await _mediator.Send(query);
+        using (Logger.BeginScope(loggerState))
+        {
+            Logger.LogInformation("Creating GetAllUsers query");
+            Logger.LogDebug(
+                "GetAllUsersRequest - SearchTerm: '{SearchTerm}', PageNumber: {PageNumber}, PageSize: {PageSize}, SortBy: '{SortBy}', SortDescending: {SortDescending}",
+                request.SearchTerm,
+                request.PageNumber,
+                request.PageSize,
+                request.SortBy,
+                request.SortDescending);
 
-        return Ok(result);
+            var query = new GetAllUsers
+            {
+                SearchTerm = request.SearchTerm,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                SortBy = request.SortBy,
+                SortDescending = request.SortDescending
+            };
+
+            Logger.LogInformation("Sending GetAllUsers query to mediator");
+
+            var result = await _mediator.Send(query);
+
+            if(result.IsFailure)
+            {
+                Logger.LogWarning("GetAllUsers query failed with error: {ErrorCode} - {ErrorMessage}",
+                    result.Error?.Code,
+                    result.Error?.Message);
+
+                return HandleOperationError(result.Error);
+            }
+
+            var paginatedResponse = result.Value!;
+
+            Logger.LogInformation("GetAllUsers query completed");
+            Logger.LogDebug(
+                "GetAllUsers result - TotalCount: {TotalCount}, PageNumber: {PageNumber}, PageSize: {PageSize}, ItemsCount: {ItemsCount}",
+                paginatedResponse.TotalCount,
+                paginatedResponse.PageNumber,
+                paginatedResponse.PageSize,
+                paginatedResponse.Items.Count);
+
+            return Ok(result);
+        }
     }
 
     [HttpGet("{id:guid}")]
@@ -89,12 +133,28 @@ public class UsersController : ApiControllerBase<UsersController>
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUserById(Guid id)
     {
-        var query = new GetUserById(id);
+        var loggerState = new Dictionary<string, object>
+        {
+            ["Operation"] = $"{OperationName}-{nameof(GetUserById)}",
+            ["Id"] = id,
+            ["RequestId"] = HttpContext.TraceIdentifier,
+            ["CorrelationId"] = CorrelationId ?? HttpContext.TraceIdentifier,
+            ["ClientIp"] = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown"
+        };
 
-        var user = await _mediator.Send(query);
+        using (Logger.BeginScope(loggerState))
+        {
+            Logger.LogInformation("Creating GetUserById query for ID: {UserId}", id);
 
-        if (user == null) return NotFound();
+            var query = new GetUserById(id);
 
-        return Ok(user);
+            Logger.LogInformation("Sending GetUserById query to mediator");
+
+            var result = await _mediator.Send(query);
+
+            Logger.LogInformation("GetUserById query completed with success: {IsSuccess}", result.IsSuccess);
+
+            return HandleOperationResult(result);
+        }
     }
 }
