@@ -8,8 +8,6 @@ public abstract class ApiControllerBase<TController> : ControllerBase
 {
     protected ILogger<TController> Logger;
 
-    public string? CorrelationId => (string?)HttpContext.Items[CorrelationIdMiddleware.CorrelationIdContextKey];
-
     protected ApiControllerBase(ILogger<TController> logger)
     {
         Logger = logger;

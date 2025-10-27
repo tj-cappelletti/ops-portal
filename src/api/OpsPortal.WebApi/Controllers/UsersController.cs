@@ -4,6 +4,7 @@ using OpsPortal.Application.Users.Commands;
 using OpsPortal.Application.Users.Queries;
 using OpsPortal.Contracts.Common;
 using OpsPortal.Contracts.Users;
+using OpsPortal.WebApi.Extensions;
 
 namespace OpsPortal.WebApi.Controllers;
 
@@ -30,7 +31,7 @@ public class UsersController : ApiControllerBase<UsersController>
             ["Identifier"] = request.Identifier,
             ["Email"] = request.Email ?? string.Empty,
             ["RequestId"] = HttpContext.TraceIdentifier,
-            ["CorrelationId"] = CorrelationId ?? HttpContext.TraceIdentifier,
+            ["CorrelationId"] = HttpContext.GetCorrelationId(),
             ["ClientIp"] = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown"
         };
 
@@ -77,7 +78,7 @@ public class UsersController : ApiControllerBase<UsersController>
         {
             ["Operation"] = $"{OperationName}-{nameof(GetAllUsers)}",
             ["RequestId"] = HttpContext.TraceIdentifier,
-            ["CorrelationId"] = CorrelationId ?? HttpContext.TraceIdentifier,
+            ["CorrelationId"] = HttpContext.GetCorrelationId(),
             ["ClientIp"] = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown"
         };
 
@@ -105,7 +106,7 @@ public class UsersController : ApiControllerBase<UsersController>
 
             var result = await _mediator.Send(query);
 
-            if(result.IsFailure)
+            if (result.IsFailure)
             {
                 Logger.LogWarning("GetAllUsers query failed with error: {ErrorCode} - {ErrorMessage}",
                     result.Error?.Code,
@@ -138,7 +139,7 @@ public class UsersController : ApiControllerBase<UsersController>
             ["Operation"] = $"{OperationName}-{nameof(GetUserById)}",
             ["Id"] = id,
             ["RequestId"] = HttpContext.TraceIdentifier,
-            ["CorrelationId"] = CorrelationId ?? HttpContext.TraceIdentifier,
+            ["CorrelationId"] = HttpContext.GetCorrelationId(),
             ["ClientIp"] = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown"
         };
 
