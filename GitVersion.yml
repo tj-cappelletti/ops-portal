@@ -1,0 +1,2 @@
+mode: ContinuousDeployment
+workflow: GitHubFlow/v1
