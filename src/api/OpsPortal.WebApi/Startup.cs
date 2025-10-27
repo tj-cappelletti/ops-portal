@@ -38,6 +38,7 @@ public class Startup
         }
 
         app.UseMiddleware<CorrelationIdMiddleware>();
+        app.UseMiddleware<RequestResponseLoggingMiddleware>();
 
         app.UseHttpsRedirection();
 
