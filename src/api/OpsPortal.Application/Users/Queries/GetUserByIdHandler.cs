@@ -21,7 +21,7 @@ public class GetUserByIdHandler : IRequestHandler<GetUserById, OperationResult<U
             .SingleOrDefaultAsync(u => u.Id == request.Id, cancellationToken);
 
         return user == null
-            ? OperationResult<UserResponse>.Failure(OperationError.CreateNotFoundOperationError("User", request.Id))
-            : OperationResult<UserResponse>.Success(user.ToUserResponse());
+            ? OperationError.CreateNotFoundOperationError("User", request.Id)
+            : user.ToUserResponse();
     }
 }

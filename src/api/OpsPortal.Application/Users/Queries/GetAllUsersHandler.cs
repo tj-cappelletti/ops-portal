@@ -78,7 +78,6 @@ public class GetAllUsersHandler : IRequestHandler<GetAllUsers, OperationResult<P
             ))
             .ToListAsync(cancellationToken);
 
-        return OperationResult<PaginatedResponse<UserResponse>>.Success(
-            PaginatedResponse<UserResponse>.Create(users, request.PageNumber, request.PageSize, totalCount));
+        return PaginatedResponse<UserResponse>.Create(users, request.PageNumber, request.PageSize, totalCount);
     }
 }
