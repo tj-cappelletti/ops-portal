@@ -11,4 +11,6 @@ public record LoginCommand : IRequest<OperationResult<LoginResponse>>
     public string? IpAddress { get; init; }
 
     public string Password { get; init; } = string.Empty;
+
+    public string? UserAgent { get; init; }
 }
