@@ -20,12 +20,14 @@ public class CurrentHttpContext : ICurrentHttpContext
     public string? GetIpAddress()
     {
         var httpContext = _httpContextAccessor.HttpContext;
+        
         if (httpContext == null) return null;
 
         var forwarded = httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
-        if (!string.IsNullOrEmpty(forwarded)) return forwarded.Split(',').First().Trim();
-
-        return httpContext.Connection.RemoteIpAddress?.ToString();
+        
+        return !string.IsNullOrEmpty(forwarded)
+            ? forwarded.Split(',').First().Trim()
+            : httpContext.Connection.RemoteIpAddress?.ToString();
     }
 
     public string? GetRequestHeader(string headerName)
