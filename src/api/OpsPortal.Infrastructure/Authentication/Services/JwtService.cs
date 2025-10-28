@@ -115,21 +115,27 @@ public class JwtService : IJwtService
 
     public async Task<TokenResult> GenerateTokenAsync(User user, CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation("Generating claims for user {UserId} ({Email})", user.Id, user.Email);
         var claims = await GenerateClaimsAsync(user, cancellationToken);
+
+        _logger.LogInformation("Loading JWT secret and generating key");
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationMinutes),
-            Issuer = _jwtSettings.Issuer,
             Audience = _jwtSettings.Audience,
+            Issuer = _jwtSettings.Issuer,
+            Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationMinutes),
             SigningCredentials = credentials,
+            Subject = new ClaimsIdentity(claims),
             NotBefore = DateTime.UtcNow
         };
 
+        _logger.LogInformation("Creating JWT token for user {UserId} ({Email})", user.Id, user.Email);
         var token = _tokenHandler.CreateToken(tokenDescriptor);
+
+        _logger.LogInformation("Writing JWT token to string for user {UserId} ({Email})", user.Id, user.Email);
         var tokenString = _tokenHandler.WriteToken(token);
 
         _logger.LogDebug("Generated JWT token for user {UserId} ({Email}), expires at {Expiration}",
