@@ -69,7 +69,7 @@ public class AuthenticationController : ApiControllerBase<AuthenticationControll
             ["Identifier"] = request.Identifier,
             ["RequestId"] = HttpContext.TraceIdentifier,
             ["CorrelationId"] = HttpContext.GetCorrelationId(),
-            ["ClientIp"] = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown"
+            ["ClientIp"] = _currentHttpContext.GetIpAddress() ?? "Unknown"
         };
 
         using (Logger.BeginScope(loggerState))
@@ -86,7 +86,8 @@ public class AuthenticationController : ApiControllerBase<AuthenticationControll
             {
                 Identifier = request.Identifier,
                 IpAddress = _currentHttpContext.GetIpAddress(),
-                Password = request.Password
+                Password = request.Password,
+                UserAgent = _currentHttpContext.GetUserAgent()
             };
 
             var result = await _mediator.Send(command);
